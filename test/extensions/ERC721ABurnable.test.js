@@ -61,7 +61,7 @@ const createTestSuite = ({ contract, constructorArgs }) =>
 
       it('cannot burn with wrong caller or spender', async function () {
         const tokenIdToBurn = this.notBurnedTokenId;
-        
+
         // sanity check
         await this.erc721aBurnable.connect(this.addr1).approve(ZERO_ADDRESS, tokenIdToBurn);
         await this.erc721aBurnable.connect(this.addr1).setApprovalForAll(this.spender.address, false);
@@ -163,9 +163,15 @@ const createTestSuite = ({ contract, constructorArgs }) =>
     });
   };
 
-describe('ERC721ABurnable', createTestSuite({ contract: 'ERC721ABurnableMock', constructorArgs: ['Azuki', 'AZUKI'] }));
+describe(
+  'ERC721ABurnable',
+  createTestSuite({ contract: 'ERC721ABurnableMockUpgradeableWithInit', constructorArgs: ['Azuki', 'AZUKI'] })
+);
 
 describe(
   'ERC721ABurnable override _startTokenId()',
-  createTestSuite({ contract: 'ERC721ABurnableStartTokenIdMock', constructorArgs: ['Azuki', 'AZUKI', 1] })
+  createTestSuite({
+    contract: 'ERC721ABurnableStartTokenIdMockUpgradeableWithInit',
+    constructorArgs: ['Azuki', 'AZUKI', 1],
+  })
 );

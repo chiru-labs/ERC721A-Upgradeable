@@ -1,7 +1,7 @@
 {
   "name": "erc721a-upgradeable",
   "version": "3.1.0",
-  "description": "ERC721A contract for Solidity",
+  "description": "ERC721A Upgradeable contract for Solidity",
   "files": [
     "/contracts/**/*.sol",
     "/build/contracts/*.json",
@@ -24,6 +24,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.4",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "@openzeppelin/upgrade-safe-transpiler": "latest",
     "chai": "^4.3.4",
     "eslint": "^8.7.0",
     "eslint-plugin-mocha": "^10.0.3",

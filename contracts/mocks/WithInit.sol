@@ -51,11 +51,29 @@ contract ERC721AOwnersExplicitMockUpgradeableWithInit is ERC721AOwnersExplicitMo
         __ERC721AOwnersExplicitMock_init(name_, symbol_);
     }
 }
-import "./ERC721ABurnableOwnersExplicitMockUpgradeable.sol";
+import "./ERC721ALowCapOwnersExplicitMockUpgradeable.sol";
 
-contract ERC721ABurnableOwnersExplicitMockUpgradeableWithInit is ERC721ABurnableOwnersExplicitMockUpgradeable {
+contract ERC721ALowCapOwnersExplicitMockUpgradeableWithInit is ERC721ALowCapOwnersExplicitMockUpgradeable {
     constructor(string memory name_, string memory symbol_) payable initializer {
-        __ERC721ABurnableOwnersExplicitMock_init(name_, symbol_);
+        __ERC721ALowCapOwnersExplicitMock_init(name_, symbol_);
+    }
+}
+import "./ERC721ALowCapMockUpgradeable.sol";
+
+contract ERC721ALowCapMockUpgradeableWithInit is ERC721ALowCapMockUpgradeable {
+    constructor(string memory name_, string memory symbol_) payable initializer {
+        __ERC721ALowCapMock_init(name_, symbol_);
+    }
+}
+import "./ERC721ALowCapStartTokenIdMockUpgradeable.sol";
+
+contract ERC721ALowCapStartTokenIdMockUpgradeableWithInit is ERC721ALowCapStartTokenIdMockUpgradeable {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        uint256 startTokenId_
+    ) payable initializer {
+        __ERC721ALowCapStartTokenIdMock_init(name_, symbol_, startTokenId_);
     }
 }
 import "./ERC721APausableMockUpgradeable.sol";
@@ -63,6 +81,13 @@ import "./ERC721APausableMockUpgradeable.sol";
 contract ERC721APausableMockUpgradeableWithInit is ERC721APausableMockUpgradeable {
     constructor(string memory name_, string memory symbol_) payable initializer {
         __ERC721APausableMock_init(name_, symbol_);
+    }
+}
+import "./ERC721ABurnableOwnersExplicitMockUpgradeable.sol";
+
+contract ERC721ABurnableOwnersExplicitMockUpgradeableWithInit is ERC721ABurnableOwnersExplicitMockUpgradeable {
+    constructor(string memory name_, string memory symbol_) payable initializer {
+        __ERC721ABurnableOwnersExplicitMock_init(name_, symbol_);
     }
 }
 import "./ERC721ABurnableMockUpgradeable.sol";

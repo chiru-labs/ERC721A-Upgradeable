@@ -103,7 +103,7 @@ const createTestSuite = ({ contract, constructorArgs }) =>
 describe(
   'ERC721AOwnersExplicit',
   createTestSuite({
-    contract: 'ERC721AOwnersExplicitMock',
+    contract: 'ERC721AOwnersExplicitMockUpgradeableWithInit',
     constructorArgs: ['Azuki', 'AZUKI'],
   })
 );
@@ -111,7 +111,7 @@ describe(
 describe(
   'ERC721AOwnersExplicit override _startTokenId()',
   createTestSuite({
-    contract: 'ERC721AOwnersExplicitStartTokenIdMock',
+    contract: 'ERC721AOwnersExplicitStartTokenIdMockUpgradeableWithInit',
     constructorArgs: ['Azuki', 'AZUKI', 1],
   })
 );
