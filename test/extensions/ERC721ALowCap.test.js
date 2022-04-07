@@ -108,23 +108,17 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
     });
   };
 
-describe(
-  'ERC721ALowCap',
-  createTestSuite({ contract: 'ERC721ALowCapMockUpgradeableWithInit', constructorArgs: ['Azuki', 'AZUKI'] })
-);
+describe('ERC721ALowCap', createTestSuite({ contract: 'ERC721ALowCapMock', constructorArgs: ['Azuki', 'AZUKI'] }));
 
 describe(
   'ERC721ALowCap override _startTokenId()',
-  createTestSuite({
-    contract: 'ERC721ALowCapStartTokenIdMockUpgradeableWithInit',
-    constructorArgs: ['Azuki', 'AZUKI', 1],
-  })
+  createTestSuite({ contract: 'ERC721ALowCapStartTokenIdMock', constructorArgs: ['Azuki', 'AZUKI', 1] })
 );
 
 describe(
   'ERC721ALowCapOwnersExplicit',
   createTestSuite({
-    contract: 'ERC721ALowCapOwnersExplicitMockUpgradeableWithInit',
+    contract: 'ERC721ALowCapOwnersExplicitMock',
     constructorArgs: ['Azuki', 'AZUKI'],
     setOwnersExplicit: true,
   })

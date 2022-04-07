@@ -246,7 +246,7 @@ const createTestSuite = ({ contract, constructorArgs }) =>
           });
         });
 
-        describe('_burn', async function () {
+        describe('_burn', async function() {
           beforeEach(function () {
             this.tokenIdToBurn = this.startTokenId;
           });
@@ -257,9 +257,9 @@ const createTestSuite = ({ contract, constructorArgs }) =>
           });
 
           it('revert if approvalCheck is true', async function () {
-            await expect(this.erc721a.connect(this.addr2).burn(this.tokenIdToBurn, true)).to.be.revertedWith(
-              'TransferCallerNotOwnerNorApproved'
-            );
+            await expect(
+              this.erc721a.connect(this.addr2).burn(this.tokenIdToBurn, true)
+            ).to.be.revertedWith('TransferCallerNotOwnerNorApproved');
           });
         });
       });
@@ -358,12 +358,9 @@ const createTestSuite = ({ contract, constructorArgs }) =>
     });
   };
 
-describe(
-  'ERC721A',
-  createTestSuite({ contract: 'ERC721AMockUpgradeableWithInit', constructorArgs: ['Azuki', 'AZUKI'] })
-);
+describe('ERC721A', createTestSuite({ contract: 'ERC721AMock', constructorArgs: ['Azuki', 'AZUKI'] }));
 
 describe(
   'ERC721A override _startTokenId()',
-  createTestSuite({ contract: 'ERC721AStartTokenIdMockUpgradeableWithInit', constructorArgs: ['Azuki', 'AZUKI', 1] })
+  createTestSuite({ contract: 'ERC721AStartTokenIdMock', constructorArgs: ['Azuki', 'AZUKI', 1] })
 );

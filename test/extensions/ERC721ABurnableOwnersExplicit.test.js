@@ -5,9 +5,9 @@ const { ZERO_ADDRESS } = constants;
 
 describe('ERC721ABurnableOwnersExplicit', function () {
   beforeEach(async function () {
-    this.token = await deployContract('ERC721ABurnableOwnersExplicitMockUpgradeableWithInit', ['Azuki', 'AZUKI']);
+    this.token = await deployContract('ERC721ABurnableOwnersExplicitMock', ['Azuki', 'AZUKI']);
   });
-
+  
   beforeEach(async function () {
     const [owner, addr1, addr2, addr3] = await ethers.getSigners();
     this.owner = owner;
@@ -28,13 +28,15 @@ describe('ERC721ABurnableOwnersExplicit', function () {
       expect(owner[0]).to.not.equal(ZERO_ADDRESS);
       if (tokenId == 0 || tokenId == 4) {
         expect(owner[2]).to.equal(true);
-        await expect(this.token.ownerOf(tokenId)).to.be.revertedWith('OwnerQueryForNonexistentToken');
+        await expect(this.token.ownerOf(tokenId)).to.be.revertedWith(
+          'OwnerQueryForNonexistentToken'
+        )
       } else {
         expect(owner[2]).to.equal(false);
-        if (tokenId < 1 + 2) {
-          expect(await this.token.ownerOf(tokenId)).to.be.equal(this.addr2.address);
+        if (tokenId < 1+2) {
+          expect(await this.token.ownerOf(tokenId)).to.be.equal(this.addr2.address);  
         } else {
-          expect(await this.token.ownerOf(tokenId)).to.be.equal(this.addr3.address);
+          expect(await this.token.ownerOf(tokenId)).to.be.equal(this.addr3.address);  
         }
       }
     }
