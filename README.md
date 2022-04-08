@@ -112,19 +112,12 @@ Project Link: [https://github.com/chiru-labs/ERC721A-Upgradeable](https://github
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
 [docs-shield]: https://img.shields.io/badge/docs-%F0%9F%93%84-blue?style=for-the-badge
-[docs-url]: https://chiru-labs.github.io/ERC721A/
-[npm-shield]: https://img.shields.io/npm/v/erc721a.svg?style=for-the-badge
-[npm-url]: https://www.npmjs.com/package/erc721a
-[ci-shield]: https://img.shields.io/github/workflow/status/chiru-labs/ERC721A/ERC721A%20CI?label=build&style=for-the-badge
-[ci-url]: https://github.com/chiru-labs/ERC721A/actions/workflows/run_tests.yml
-[contributors-shield]: https://img.shields.io/github/contributors/chiru-labs/ERC721A.svg?style=for-the-badge
-[contributors-url]: https://github.com/chiru-labs/ERC721A/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/chiru-labs/ERC721A.svg?style=for-the-badge
-[forks-url]: https://github.com/chiru-labs/ERC721A/network/members
-[stars-shield]: https://img.shields.io/github/stars/chiru-labs/ERC721A.svg?style=for-the-badge
-[stars-url]: https://github.com/chiru-labs/ERC721A/stargazers
-[issues-shield]: https://img.shields.io/github/issues/chiru-labs/ERC721A.svg?style=for-the-badge
-[issues-url]: https://github.com/chiru-labs/ERC721A/issues
+[docs-url]: https://chiru-labs.github.io/ERC721A/#/upgradeable
+[npm-shield]: https://img.shields.io/npm/v/erc721a-upgradeable.svg?style=for-the-badge
+[npm-url]: https://www.npmjs.com/package/erc721a-upgradeable
+[ci-shield]: https://img.shields.io/github/workflow/status/chiru-labs/ERC721A-Upgradeable/ERC721A%20Upgradeable%20CI?label=build&style=for-the-badge
+[ci-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/actions/workflows/run_tests.yml
+[issues-shield]: https://img.shields.io/github/issues/chiru-labs/ERC721A-Upgradeable.svg?style=for-the-badge
+[issues-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/issues
 [license-shield]: https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge
-[license-url]: https://github.com/chiru-labs/ERC721A/blob/main/LICENSE.txt
-[product-screenshot]: images/screenshot.png
+[license-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/blob/main/LICENSE.txt
