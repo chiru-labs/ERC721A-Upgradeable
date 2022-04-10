@@ -3,17 +3,17 @@
 
 pragma solidity ^0.8.4;
 
-import "./ERC721ALowCapMockUpgradeable.sol";
+import "./ERC721AQueryableMockUpgradeable.sol";
 import "../extensions/ERC721AOwnersExplicitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC721ALowCapOwnersExplicitMockUpgradeable is Initializable, ERC721ALowCapMockUpgradeable, ERC721AOwnersExplicitUpgradeable {
-    function __ERC721ALowCapOwnersExplicitMock_init(string memory name_, string memory symbol_) internal onlyInitializing {
+contract ERC721AQueryableOwnersExplicitMockUpgradeable is Initializable, ERC721AQueryableMockUpgradeable, ERC721AOwnersExplicitUpgradeable {
+    function __ERC721AQueryableOwnersExplicitMock_init(string memory name_, string memory symbol_) internal onlyInitializing {
         __ERC721A_init_unchained(name_, symbol_);
-        __ERC721ALowCapMock_init_unchained(name_, symbol_);
+        __ERC721AQueryableMock_init_unchained(name_, symbol_);
     }
 
-    function __ERC721ALowCapOwnersExplicitMock_init_unchained(string memory, string memory) internal onlyInitializing {}
+    function __ERC721AQueryableOwnersExplicitMock_init_unchained(string memory, string memory) internal onlyInitializing {}
 
     function setOwnersExplicit(uint256 quantity) public {
         _setOwnersExplicit(quantity);
