@@ -12,8 +12,9 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
       beforeEach(async function () {
         this.erc721aQueryable = await deployContract(contract, constructorArgs);
 
-        this.startTokenId = this.erc721aQueryable.startTokenId ? 
-          (await this.erc721aQueryable.startTokenId()).toNumber() : 0;
+        this.startTokenId = this.erc721aQueryable.startTokenId
+          ? (await this.erc721aQueryable.startTokenId()).toNumber()
+          : 0;
 
         offseted = (...arr) => arr.map((num) => BigNumber.from(this.startTokenId + num));
       });
@@ -170,11 +171,13 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
         describe('tokensOfOwnerIn', async function () {
           const expectCorrect = async function (addr, start, stop) {
             if (BigNumber.from(start).gte(BigNumber.from(stop))) {
-              await expect(this.erc721aQueries.tokensOfOwnerIn(addr, start, stop))
-                .to.be.revertedWith('InvalidQueryRange');
+              await expect(this.erc721aQueries.tokensOfOwnerIn(addr, start, stop)).to.be.revertedWith(
+                'InvalidQueryRange'
+              );
             } else {
-              const expectedTokens = (await this.erc721aQueryable.tokensOfOwner(addr))
-                .filter(x => BigNumber.from(start).lte(x) && BigNumber.from(stop).gt(x));
+              const expectedTokens = (await this.erc721aQueryable.tokensOfOwner(addr)).filter(
+                (x) => BigNumber.from(start).lte(x) && BigNumber.from(stop).gt(x)
+              );
               const tokens = await this.erc721aQueryable.tokensOfOwnerIn(addr, start, stop);
               expect(tokens).to.eql(expectedTokens);
             }
@@ -210,7 +213,7 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
           };
 
           subTests('initial', async function () {});
-          
+
           subTests('after a token tranfer', async function () {
             await this.erc721aQueryable.transferFrom(this.owner.address, this.addr4.address, offseted(7)[0]);
           });
@@ -221,7 +224,7 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
         });
 
         describe('explicitOwnershipOf', async function () {
-          it('token exists', async function () {  
+          it('token exists', async function () {
             const tokenId = this.owner.expected.tokens[0];
             const explicitOwnership = await this.erc721aQueryable.explicitOwnershipOf(tokenId);
             expectExplicitOwnershipExists(explicitOwnership, this.owner.address);
@@ -293,23 +296,26 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
     });
   };
 
-describe('ERC721AQueryable', createTestSuite({ 
-  contract: 'ERC721AQueryableMock', 
-  constructorArgs: ['Azuki', 'AZUKI'] 
-}));
+describe(
+  'ERC721AQueryable',
+  createTestSuite({
+    contract: 'ERC721AQueryableMock',
+    constructorArgs: ['Azuki', 'AZUKI'],
+  })
+);
 
 describe(
   'ERC721AQueryable override _startTokenId()',
-  createTestSuite({ 
-    contract: 'ERC721AQueryableStartTokenIdMock', 
-    constructorArgs: ['Azuki', 'AZUKI', 1] 
+  createTestSuite({
+    contract: 'ERC721AQueryableStartTokenIdMockUpgradeableWithInit',
+    constructorArgs: ['Azuki', 'AZUKI', 1],
   })
 );
 
 describe(
   'ERC721AQueryableOwnersExplicit',
   createTestSuite({
-    contract: 'ERC721AQueryableOwnersExplicitMock',
+    contract: 'ERC721AQueryableOwnersExplicitMockUpgradeableWithInit',
     constructorArgs: ['Azuki', 'AZUKI'],
     setOwnersExplicit: true,
   })
