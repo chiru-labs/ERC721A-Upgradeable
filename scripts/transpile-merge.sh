@@ -16,8 +16,9 @@ cd ./ERC721A;
 commit="$(git rev-parse HEAD)";
 cd ..;
 
-# Replace the contracts folder with the latest copy.
+# Replace the contracts and test folder with the latest copy.
 rm -r ./contracts;
+rm -r ./test;
 rm -r @openzeppelin;
 rsync -av --progress ERC721A/ ./ \
 	--exclude README.md \
