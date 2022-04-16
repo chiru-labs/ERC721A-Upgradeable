@@ -18,7 +18,7 @@ contract ERC721AGasReporterMockUpgradeable is Initializable, ERC721AUpgradeable 
     }
 
     function mintOne(address to) public {
-        _mint(to, 1, '', false);
+        _mint(to, 1);
     }
 
     function safeMintTen(address to) public {
@@ -26,7 +26,7 @@ contract ERC721AGasReporterMockUpgradeable is Initializable, ERC721AUpgradeable 
     }
 
     function mintTen(address to) public {
-        _mint(to, 10, '', false);
+        _mint(to, 10);
     }
 
     /**
