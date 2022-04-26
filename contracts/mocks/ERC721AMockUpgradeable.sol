@@ -41,7 +41,11 @@ contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
         _safeMint(to, quantity);
     }
 
-    function safeMint(address to, uint256 quantity, bytes memory _data) public {
+    function safeMint(
+        address to,
+        uint256 quantity,
+        bytes memory _data
+    ) public {
         _safeMint(to, quantity, _data);
     }
 

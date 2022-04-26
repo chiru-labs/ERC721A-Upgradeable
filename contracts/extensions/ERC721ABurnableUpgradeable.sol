@@ -3,6 +3,7 @@
 
 pragma solidity ^0.8.4;
 
+import "./IERC721ABurnableUpgradeable.sol";
 import "../ERC721AUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  * @title ERC721A Burnable Token
  * @dev ERC721A Token that can be irreversibly burned (destroyed).
  */
-abstract contract ERC721ABurnableUpgradeable is Initializable, ERC721AUpgradeable {
+abstract contract ERC721ABurnableUpgradeable is Initializable, ERC721AUpgradeable, IERC721ABurnableUpgradeable {
     function __ERC721ABurnable_init() internal onlyInitializing {
     }
 

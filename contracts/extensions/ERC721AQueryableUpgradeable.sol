@@ -3,16 +3,15 @@
 
 pragma solidity ^0.8.4;
 
+import "./IERC721AQueryableUpgradeable.sol";
 import "../ERC721AUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
-error InvalidQueryRange();
 
 /**
  * @title ERC721A Queryable
  * @dev ERC721A subclass with convenience query functions.
  */
-abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeable {
+abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeable, IERC721AQueryableUpgradeable {
     function __ERC721AQueryable_init() internal onlyInitializing {
     }
 
