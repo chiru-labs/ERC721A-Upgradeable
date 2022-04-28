@@ -35,7 +35,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
      *   - `startTimestamp` = `<Timestamp of start of ownership>`
      *   - `burned = `false`
      */
-    function explicitOwnershipOf(uint256 tokenId) public view returns (TokenOwnership memory) {
+    function explicitOwnershipOf(uint256 tokenId) public view override returns (TokenOwnership memory) {
         TokenOwnership memory ownership;
         if (tokenId < _startTokenId() || tokenId >= _currentIndex) {
             return ownership;
@@ -51,7 +51,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
      * @dev Returns an array of `TokenOwnership` structs at `tokenIds` in order.
      * See {ERC721AQueryable-explicitOwnershipOf}
      */
-    function explicitOwnershipsOf(uint256[] memory tokenIds) external view returns (TokenOwnership[] memory) {
+    function explicitOwnershipsOf(uint256[] memory tokenIds) external view override returns (TokenOwnership[] memory) {
         unchecked {
             uint256 tokenIdsLength = tokenIds.length;
             TokenOwnership[] memory ownerships = new TokenOwnership[](tokenIdsLength);
@@ -78,7 +78,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
         address owner,
         uint256 start,
         uint256 stop
-    ) external view returns (uint256[] memory) {
+    ) external view override returns (uint256[] memory) {
         unchecked {
             if (start >= stop) revert InvalidQueryRange();
             uint256 tokenIdsIdx;
@@ -145,7 +145,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
      * multiple smaller scans if the collection is large enough to cause
      * an out-of-gas error (10K pfp collections should be fine).
      */
-    function tokensOfOwner(address owner) external view returns (uint256[] memory) {
+    function tokensOfOwner(address owner) external view override returns (uint256[] memory) {
         unchecked {
             uint256 tokenIdsIdx;
             address currOwnershipAddr;

@@ -24,7 +24,7 @@ abstract contract ERC721ABurnableUpgradeable is Initializable, ERC721AUpgradeabl
      *
      * - The caller must own `tokenId` or be an approved operator.
      */
-    function burn(uint256 tokenId) public virtual {
+    function burn(uint256 tokenId) public virtual override {
         _burn(tokenId, true);
     }
 
