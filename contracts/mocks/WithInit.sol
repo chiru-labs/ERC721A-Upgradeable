@@ -83,13 +83,6 @@ contract ERC721ABurnableOwnersExplicitMockUpgradeableWithInit is ERC721ABurnable
         __ERC721ABurnableOwnersExplicitMock_init(name_, symbol_);
     }
 }
-import "./ERC721APausableMockUpgradeable.sol";
-
-contract ERC721APausableMockUpgradeableWithInit is ERC721APausableMockUpgradeable {
-    constructor(string memory name_, string memory symbol_) payable initializer {
-        __ERC721APausableMock_init(name_, symbol_);
-    }
-}
 import "./ERC721ABurnableMockUpgradeable.sol";
 
 contract ERC721ABurnableMockUpgradeableWithInit is ERC721ABurnableMockUpgradeable {
