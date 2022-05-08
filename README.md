@@ -44,6 +44,12 @@ https://chiru-labs.github.io/ERC721A/
 npm install --save-dev erc721a-upgradeable
 
 ```
+or
+```sh
+
+yarn add -D erc721a-upgradeable
+
+```
 
 <!-- USAGE EXAMPLES -->
 
