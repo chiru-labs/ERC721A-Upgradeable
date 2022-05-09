@@ -219,7 +219,8 @@ contract ERC721AUpgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
             revert ApprovalCallerNotOwnerNorApproved();
         }
 
-        _approve(to, tokenId, owner);
+        _tokenApprovals[tokenId] = to;
+        emit Approval(owner, to, tokenId);
     }
 
     /**
@@ -424,8 +425,8 @@ contract ERC721AUpgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
 
         _beforeTokenTransfers(from, to, tokenId, 1);
 
-        // Clear approvals from the previous owner
-        _approve(address(0), tokenId, from);
+        // Clear approvals from the previous owner.
+        delete _tokenApprovals[tokenId];
 
         // Underflow of the sender's balance is impossible because we check for
         // ownership above and the recipient's balance can't realistically overflow.
@@ -488,8 +489,8 @@ contract ERC721AUpgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
 
         _beforeTokenTransfers(from, address(0), tokenId, 1);
 
-        // Clear approvals from the previous owner
-        _approve(address(0), tokenId, from);
+        // Clear approvals from the previous owner.
+        delete _tokenApprovals[tokenId];
 
         // Underflow of the sender's balance is impossible because we check for
         // ownership above and the recipient's balance can't realistically overflow.
@@ -526,20 +527,6 @@ contract ERC721AUpgradeable is Initializable, ContextUpgradeable, ERC165Upgradea
         unchecked {
             _burnCounter++;
         }
-    }
-
-    /**
-     * @dev Approve `to` to operate on `tokenId`
-     *
-     * Emits a {Approval} event.
-     */
-    function _approve(
-        address to,
-        uint256 tokenId,
-        address owner
-    ) private {
-        _tokenApprovals[tokenId] = to;
-        emit Approval(owner, to, tokenId);
     }
 
     /**
