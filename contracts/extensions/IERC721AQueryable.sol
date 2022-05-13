@@ -4,12 +4,12 @@
 
 pragma solidity ^0.8.4;
 
-import "../IERC721AUpgradeable.sol";
+import '../IERC721A.sol';
 
 /**
  * @dev Interface of an ERC721AQueryable compliant contract.
  */
-interface IERC721AQueryableUpgradeable is IERC721AUpgradeable {
+interface IERC721AQueryable is IERC721A {
     /**
      * Invalid query range (`start` >= `stop`).
      */

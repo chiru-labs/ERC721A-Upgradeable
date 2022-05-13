@@ -4,4 +4,4 @@
 
 pragma solidity ^0.8.4;
 
-import "../IERC721AUpgradeable.sol";
+import '../extensions/IERC721ABurnable.sol';
