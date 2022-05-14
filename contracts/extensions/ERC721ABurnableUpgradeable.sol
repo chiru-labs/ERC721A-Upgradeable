@@ -6,7 +6,7 @@ pragma solidity ^0.8.4;
 
 import "./IERC721ABurnableUpgradeable.sol";
 import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../Initializable.sol";
 
 /**
  * @title ERC721A Burnable Token
@@ -14,6 +14,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  */
 abstract contract ERC721ABurnableUpgradeable is Initializable, ERC721AUpgradeable, IERC721ABurnableUpgradeable {
     function __ERC721ABurnable_init() internal onlyInitializing {
+        __ERC721ABurnable_init_unchained();
     }
 
     function __ERC721ABurnable_init_unchained() internal onlyInitializing {
@@ -28,11 +29,4 @@ abstract contract ERC721ABurnableUpgradeable is Initializable, ERC721AUpgradeabl
     function burn(uint256 tokenId) public virtual override {
         _burn(tokenId, true);
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[50] private __gap;
 }

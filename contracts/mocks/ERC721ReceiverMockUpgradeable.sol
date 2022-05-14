@@ -5,17 +5,17 @@
 pragma solidity ^0.8.4;
 
 import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { ERC721ReceiverMockStorage } from "./ERC721ReceiverMockStorage.sol";
+import "../Initializable.sol";
 
 contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721ReceiverUpgradeable {
+    using ERC721ReceiverMockStorage for ERC721ReceiverMockStorage.Layout;
     enum Error {
         None,
         RevertWithMessage,
         RevertWithoutMessage,
         Panic
     }
-
-    bytes4 private _retval;
 
     event Received(address operator, address from, uint256 tokenId, bytes data, uint256 gas);
 
@@ -24,7 +24,7 @@ contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721Receive
     }
 
     function __ERC721ReceiverMock_init_unchained(bytes4 retval) internal onlyInitializing {
-        _retval = retval;
+        ERC721ReceiverMockStorage.layout()._retval = retval;
     }
 
     function onERC721Received(
@@ -34,13 +34,6 @@ contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721Receive
         bytes memory data
     ) public override returns (bytes4) {
         emit Received(operator, from, tokenId, data, 20000);
-        return _retval;
+        return ERC721ReceiverMockStorage.layout()._retval;
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
 }

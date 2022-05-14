@@ -5,10 +5,15 @@
 pragma solidity ^0.8.4;
 
 import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { ERC721AOwnersExplicitStorage } from "./ERC721AOwnersExplicitStorage.sol";
+import { ERC721AStorage } from "../ERC721AStorage.sol";
+import "../Initializable.sol";
 
 abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgradeable {
+    using ERC721AStorage for ERC721AStorage.Layout;
+    using ERC721AOwnersExplicitStorage for ERC721AOwnersExplicitStorage.Layout;
     function __ERC721AOwnersExplicit_init() internal onlyInitializing {
+        __ERC721AOwnersExplicit_init_unchained();
     }
 
     function __ERC721AOwnersExplicit_init_unchained() internal onlyInitializing {
@@ -28,19 +33,17 @@ abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgr
      */
     error NoTokensMintedYet();
 
-    uint256 public nextOwnerToExplicitlySet;
-
     /**
      * @dev Explicitly set `owners` to eliminate loops in future calls of ownerOf().
      */
     function _setOwnersExplicit(uint256 quantity) internal {
         if (quantity == 0) revert QuantityMustBeNonZero();
-        if (_currentIndex == _startTokenId()) revert NoTokensMintedYet();
-        uint256 _nextOwnerToExplicitlySet = nextOwnerToExplicitlySet;
+        if (ERC721AStorage.layout()._currentIndex == _startTokenId()) revert NoTokensMintedYet();
+        uint256 _nextOwnerToExplicitlySet = ERC721AOwnersExplicitStorage.layout().nextOwnerToExplicitlySet;
         if (_nextOwnerToExplicitlySet == 0) {
             _nextOwnerToExplicitlySet = _startTokenId();
         }
-        if (_nextOwnerToExplicitlySet >= _currentIndex) revert AllOwnershipsHaveBeenSet();
+        if (_nextOwnerToExplicitlySet >= ERC721AStorage.layout()._currentIndex) revert AllOwnershipsHaveBeenSet();
 
         // Index underflow is impossible.
         // Counter or index overflow is incredibly unrealistic.
@@ -48,26 +51,24 @@ abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgr
             uint256 endIndex = _nextOwnerToExplicitlySet + quantity - 1;
 
             // Set the end index to be the last token index
-            if (endIndex + 1 > _currentIndex) {
-                endIndex = _currentIndex - 1;
+            if (endIndex + 1 > ERC721AStorage.layout()._currentIndex) {
+                endIndex = ERC721AStorage.layout()._currentIndex - 1;
             }
 
             for (uint256 i = _nextOwnerToExplicitlySet; i <= endIndex; i++) {
-                if (_ownerships[i].addr == address(0) && !_ownerships[i].burned) {
+                if (ERC721AStorage.layout()._ownerships[i].addr == address(0) && !ERC721AStorage.layout()._ownerships[i].burned) {
                     TokenOwnership memory ownership = _ownershipOf(i);
-                    _ownerships[i].addr = ownership.addr;
-                    _ownerships[i].startTimestamp = ownership.startTimestamp;
+                    ERC721AStorage.layout()._ownerships[i].addr = ownership.addr;
+                    ERC721AStorage.layout()._ownerships[i].startTimestamp = ownership.startTimestamp;
                 }
             }
 
-            nextOwnerToExplicitlySet = endIndex + 1;
+            ERC721AOwnersExplicitStorage.layout().nextOwnerToExplicitlySet = endIndex + 1;
         }
     }
+    // generated getter for ${varDecl.name}
+    function nextOwnerToExplicitlySet() public view returns(uint256) {
+        return ERC721AOwnersExplicitStorage.layout().nextOwnerToExplicitlySet;
+    }
 
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
 }

@@ -6,14 +6,17 @@ pragma solidity ^0.8.4;
 
 import "./IERC721AQueryableUpgradeable.sol";
 import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { ERC721AStorage } from "../ERC721AStorage.sol";
+import "../Initializable.sol";
 
 /**
  * @title ERC721A Queryable
  * @dev ERC721A subclass with convenience query functions.
  */
 abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeable, IERC721AQueryableUpgradeable {
+    using ERC721AStorage for ERC721AStorage.Layout;
     function __ERC721AQueryable_init() internal onlyInitializing {
+        __ERC721AQueryable_init_unchained();
     }
 
     function __ERC721AQueryable_init_unchained() internal onlyInitializing {
@@ -38,10 +41,10 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
      */
     function explicitOwnershipOf(uint256 tokenId) public view override returns (TokenOwnership memory) {
         TokenOwnership memory ownership;
-        if (tokenId < _startTokenId() || tokenId >= _currentIndex) {
+        if (tokenId < _startTokenId() || tokenId >= ERC721AStorage.layout()._currentIndex) {
             return ownership;
         }
-        ownership = _ownerships[tokenId];
+        ownership = ERC721AStorage.layout()._ownerships[tokenId];
         if (ownership.burned) {
             return ownership;
         }
@@ -83,7 +86,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
         unchecked {
             if (start >= stop) revert InvalidQueryRange();
             uint256 tokenIdsIdx;
-            uint256 stopLimit = _currentIndex;
+            uint256 stopLimit = ERC721AStorage.layout()._currentIndex;
             // Set `start = max(start, _startTokenId())`.
             if (start < _startTokenId()) {
                 start = _startTokenId();
@@ -117,7 +120,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
                 currOwnershipAddr = ownership.addr;
             }
             for (uint256 i = start; i != stop && tokenIdsIdx != tokenIdsMaxLength; ++i) {
-                ownership = _ownerships[i];
+                ownership = ERC721AStorage.layout()._ownerships[i];
                 if (ownership.burned) {
                     continue;
                 }
@@ -154,7 +157,7 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
             uint256[] memory tokenIds = new uint256[](tokenIdsLength);
             TokenOwnership memory ownership;
             for (uint256 i = _startTokenId(); tokenIdsIdx != tokenIdsLength; ++i) {
-                ownership = _ownerships[i];
+                ownership = ERC721AStorage.layout()._ownerships[i];
                 if (ownership.burned) {
                     continue;
                 }
@@ -168,11 +171,4 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
             return tokenIds;
         }
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[50] private __gap;
 }
