@@ -15,6 +15,8 @@
 
 This repository hosts the Upgradeable variant of [ERC721A](https://github.com/chiru-labs/ERC721A), meant for use in upgradeable contracts. This variant is available as separate package called `erc721a-upgradeable`.
 
+This version uses the [diamond storage layout pattern](https://eips.ethereum.org/EIPS/eip-2535).
+
 It follows all of the rules for [Writing Upgradeable Contracts]: constructors are replaced by initializer functions, state variables are initialized in initializer functions, and we additionally check for storage incompatibilities across minor versions.
 
 [writing upgradeable contracts]: https://docs.openzeppelin.com/upgrades-plugins/writing-upgradeable
