@@ -4,12 +4,13 @@
 
 pragma solidity ^0.8.4;
 
-import './IERC721A.sol';
+import "./IERC721AUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @dev ERC721 token receiver interface.
  */
-interface ERC721A__IERC721Receiver {
+interface ERC721A__IERC721ReceiverUpgradeable {
     function onERC721Received(
         address operator,
         address from,
@@ -28,7 +29,7 @@ interface ERC721A__IERC721Receiver {
  *
  * Assumes that the maximum token id cannot exceed 2**256 - 1 (max value of uint256).
  */
-contract ERC721A is IERC721A {
+contract ERC721AUpgradeable is Initializable, IERC721AUpgradeable {
     // The tokenId of the next token to be minted.
     uint256 internal _currentIndex;
 
@@ -54,7 +55,11 @@ contract ERC721A is IERC721A {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    constructor(string memory name_, string memory symbol_) {
+    function __ERC721A_init(string memory name_, string memory symbol_) internal onlyInitializing {
+        __ERC721A_init_unchained(name_, symbol_);
+    }
+
+    function __ERC721A_init_unchained(string memory name_, string memory symbol_) internal onlyInitializing {
         _name = name_;
         _symbol = symbol_;
         _currentIndex = _startTokenId();
@@ -214,7 +219,7 @@ contract ERC721A is IERC721A {
      * @dev See {IERC721-approve}.
      */
     function approve(address to, uint256 tokenId) public override {
-        address owner = ERC721A.ownerOf(tokenId);
+        address owner = ERC721AUpgradeable.ownerOf(tokenId);
         if (to == owner) revert ApprovalToCurrentOwner();
 
         if (_msgSender() != owner) if(!isApprovedForAll(owner, _msgSender())) {
@@ -546,9 +551,9 @@ contract ERC721A is IERC721A {
         uint256 tokenId,
         bytes memory _data
     ) private returns (bool) {
-        try ERC721A__IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) 
+        try ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received(_msgSender(), from, tokenId, _data) 
         returns (bytes4 retval) {
-            return retval == ERC721A__IERC721Receiver(to).onERC721Received.selector;
+            return retval == ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received.selector;
         } catch (bytes memory reason) {
             if (reason.length == 0) {
                 revert TransferToNonERC721ReceiverImplementer();
@@ -644,4 +649,11 @@ contract ERC721A is IERC721A {
             return string(buffer);    
         }
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[42] private __gap;
 }

@@ -7,7 +7,7 @@ pragma solidity ^0.8.4;
 /**
  * @dev Interface of an ERC721A compliant contract.
  */
-interface IERC721A {
+interface IERC721AUpgradeable {
     /**
      * The caller must own the token or be an approved operator.
      */

@@ -4,10 +4,15 @@
 
 pragma solidity ^0.8.4;
 
-import '../ERC721A.sol';
+import "../ERC721AUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC721AMock is ERC721A {
-    constructor(string memory name_, string memory symbol_) ERC721A(name_, symbol_) {}
+contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
+    function __ERC721AMock_init(string memory name_, string memory symbol_) internal onlyInitializing {
+        __ERC721A_init_unchained(name_, symbol_);
+    }
+
+    function __ERC721AMock_init_unchained(string memory, string memory) internal onlyInitializing {}
 
     function numberMinted(address owner) public view returns (uint256) {
         return _numberMinted(owner);
@@ -56,4 +61,11 @@ contract ERC721AMock is ERC721A {
     function toString(uint256 x) public pure returns (string memory) {
         return _toString(x);
     }
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[50] private __gap;
 }
