@@ -6,7 +6,7 @@ pragma solidity ^0.8.4;
 
 import "./IERC721AUpgradeable.sol";
 import { ERC721AStorage } from "./ERC721AStorage.sol";
-import "./Initializable.sol";
+import "./ERC721A__Initializable.sol";
 
 /**
  * @dev ERC721 token receiver interface.
@@ -30,14 +30,14 @@ interface ERC721A__IERC721ReceiverUpgradeable {
  *
  * Assumes that the maximum token id cannot exceed 2**256 - 1 (max value of uint256).
  */
-contract ERC721AUpgradeable is Initializable, IERC721AUpgradeable {
+contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
 
-    function __ERC721A_init(string memory name_, string memory symbol_) internal onlyInitializing {
+    function __ERC721A_init(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
         __ERC721A_init_unchained(name_, symbol_);
     }
 
-    function __ERC721A_init_unchained(string memory name_, string memory symbol_) internal onlyInitializing {
+    function __ERC721A_init_unchained(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
         ERC721AStorage.layout()._name = name_;
         ERC721AStorage.layout()._symbol = symbol_;
         ERC721AStorage.layout()._currentIndex = _startTokenId();

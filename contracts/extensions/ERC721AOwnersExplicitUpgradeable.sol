@@ -7,16 +7,16 @@ pragma solidity ^0.8.4;
 import "../ERC721AUpgradeable.sol";
 import { ERC721AOwnersExplicitStorage } from "./ERC721AOwnersExplicitStorage.sol";
 import { ERC721AStorage } from "../ERC721AStorage.sol";
-import "../Initializable.sol";
+import "../ERC721A__Initializable.sol";
 
-abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgradeable {
+abstract contract ERC721AOwnersExplicitUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
     using ERC721AOwnersExplicitStorage for ERC721AOwnersExplicitStorage.Layout;
-    function __ERC721AOwnersExplicit_init() internal onlyInitializing {
+    function __ERC721AOwnersExplicit_init() internal onlyInitializingERC721A {
         __ERC721AOwnersExplicit_init_unchained();
     }
 
-    function __ERC721AOwnersExplicit_init_unchained() internal onlyInitializing {
+    function __ERC721AOwnersExplicit_init_unchained() internal onlyInitializingERC721A {
     }
     /**
      * No more ownership slots to explicity initialize.

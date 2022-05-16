@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
  * @dev This is a base storage for the  initialization function for upgradeable diamond facet contracts
 **/
 
-library InitializableStorage {
+library ERC721A__InitializableStorage {
 
   struct Layout {
     /*

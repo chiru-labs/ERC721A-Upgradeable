@@ -14,31 +14,31 @@ pragma solidity ^0.8.0;
  * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
  */
 
-import { InitializableStorage } from './InitializableStorage.sol';
+import { ERC721A__InitializableStorage } from './ERC721A__InitializableStorage.sol';
 
-abstract contract Initializable {
-  using InitializableStorage for InitializableStorage.Layout;
+abstract contract ERC721A__Initializable {
+  using ERC721A__InitializableStorage for ERC721A__InitializableStorage.Layout;
 
   /**
    * @dev Modifier to protect an initializer function from being invoked twice.
    */
-  modifier initializer() {
+  modifier initializerERC721A() {
     // If the contract is initializing we ignore whether _initialized is set in order to support multiple
     // inheritance patterns, but we only do this in the context of a constructor, because in other contexts the
     // contract may have been reentered.
-    require(InitializableStorage.layout()._initializing ? _isConstructor() :
-        !InitializableStorage.layout()._initialized, "Initializable: contract is already initialized");
+    require(ERC721A__InitializableStorage.layout()._initializing ? _isConstructor() :
+        !ERC721A__InitializableStorage.layout()._initialized, "ERC721A__Initializable: contract is already initialized");
 
-    bool isTopLevelCall = !InitializableStorage.layout()._initializing;
+    bool isTopLevelCall = !ERC721A__InitializableStorage.layout()._initializing;
     if (isTopLevelCall) {
-      InitializableStorage.layout()._initializing = true;
-      InitializableStorage.layout()._initialized = true;
+      ERC721A__InitializableStorage.layout()._initializing = true;
+      ERC721A__InitializableStorage.layout()._initialized = true;
     }
 
     _;
 
     if (isTopLevelCall) {
-      InitializableStorage.layout()._initializing = false;
+      ERC721A__InitializableStorage.layout()._initializing = false;
     }
   }
 
@@ -46,8 +46,8 @@ abstract contract Initializable {
    * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
    * {initializer} modifier, directly or indirectly.
    */
-  modifier onlyInitializing() {
-    require(InitializableStorage.layout()._initializing, "Initializable: contract is not initializing");
+  modifier onlyInitializingERC721A() {
+    require(ERC721A__InitializableStorage.layout()._initializing, "ERC721A__Initializable: contract is not initializing");
     _;
   }
 
