@@ -40,6 +40,7 @@ echo "Transpiling";
 # -D: delete original and excluded files
 # -E: extract storage for Diamond Pattern
 npx @gnus.ai/upgrade-safe-transpiler-diamond -D -E;
+node scripts/replace-imports.js;
 
 # Commit and push
 echo "Committing latest code";
