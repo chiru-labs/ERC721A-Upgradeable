@@ -13,6 +13,7 @@ glob('contracts/**/*.sol', null, function (err, files) {
     const content = fs.readFileSync(file, 'utf8');
 
     const updatedContent = content
+      .replace(/open.*?torage\./g, 'ERC721A.contracts.storage.')
       .replace(/modifier initializer/g, 'modifier initializerERC721A')
       .replace(/initializer\s*?\{/g, 'initializerERC721A {')
       .replace(/modifier onlyInitializing/g, 'modifier onlyInitializingERC721A')
