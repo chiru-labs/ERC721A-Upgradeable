@@ -62,6 +62,10 @@ contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
         return _toString(x);
     }
 
+    function getOwnershipAt(uint256 index) public view returns (TokenOwnership memory) {
+        return _ownershipAt(index);
+    }
+
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.

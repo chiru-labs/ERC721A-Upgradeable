@@ -21,7 +21,7 @@ contract ERC721AQueryableOwnersExplicitMockUpgradeable is Initializable, ERC721A
     }
 
     function getOwnershipAt(uint256 index) public view returns (TokenOwnership memory) {
-        return _ownerships[index];
+        return _ownershipAt(index);
     }
 
     /**
