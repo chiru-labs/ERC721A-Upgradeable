@@ -23,8 +23,8 @@ contract ERC721ABurnableOwnersExplicitMockUpgradeable is Initializable, ERC721AU
         _safeMint(to, quantity);
     }
 
-    function setOwnersExplicit(uint256 quantity) public {
-        _setOwnersExplicit(quantity);
+    function initializeOwnersExplicit(uint256 quantity) public {
+        _initializeOwnersExplicit(quantity);
     }
 
     function getOwnershipAt(uint256 index) public view returns (TokenOwnership memory) {
