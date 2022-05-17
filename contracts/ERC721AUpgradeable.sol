@@ -32,6 +32,32 @@ interface ERC721A__IERC721ReceiverUpgradeable {
  */
 contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
+    // Mask of an entry in packed address data.
+    uint256 private constant BITMASK_ADDRESS_DATA_ENTRY = (1 << 64) - 1;
+
+    // The bit position of `numberMinted` in packed address data.
+    uint256 private constant BITPOS_NUMBER_MINTED = 64;
+
+    // The bit position of `numberBurned` in packed address data.
+    uint256 private constant BITPOS_NUMBER_BURNED = 128;
+
+    // The bit position of `aux` in packed address data.
+    uint256 private constant BITPOS_AUX = 192;
+
+    // Mask of all 256 bits in packed address data except the 64 bits for `aux`.
+    uint256 private constant BITMASK_AUX_COMPLEMENT = (1 << 192) - 1;
+
+    // The bit position of `startTimestamp` in packed ownership.
+    uint256 private constant BITPOS_START_TIMESTAMP = 160;
+
+    // The bit mask of the `burned` bit in packed ownership.
+    uint256 private constant BITMASK_BURNED = 1 << 224;
+    
+    // The bit position of the `nextInitialized` bit in packed ownership.
+    uint256 private constant BITPOS_NEXT_INITIALIZED = 225;
+
+    // The bit mask of the `nextInitialized` bit in packed ownership.
+    uint256 private constant BITMASK_NEXT_INITIALIZED = 1 << 225;
 
     function __ERC721A_init(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
         __ERC721A_init_unchained(name_, symbol_);
@@ -44,39 +70,56 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     }
 
     /**
-     * To change the starting tokenId, please override this function.
+     * @dev Returns the starting token ID. 
+     * To change the starting token ID, please override this function.
      */
     function _startTokenId() internal view virtual returns (uint256) {
         return 0;
     }
 
     /**
-     * @dev Burned tokens are calculated here, use _totalMinted() if you want to count just minted tokens.
+     * @dev Returns the next token ID to be minted.
+     */
+    function _nextTokenId() internal view returns (uint256) {
+        return ERC721AStorage.layout()._currentIndex;
+    }
+
+    /**
+     * @dev Returns the total number of tokens in existence.
+     * Burned tokens will reduce the count. 
+     * To get the total number of tokens minted, please see `_totalMinted`.
      */
     function totalSupply() public view override returns (uint256) {
         // Counter underflow is impossible as _burnCounter cannot be incremented
-        // more than _currentIndex - _startTokenId() times
+        // more than `_currentIndex - _startTokenId()` times.
         unchecked {
             return ERC721AStorage.layout()._currentIndex - ERC721AStorage.layout()._burnCounter - _startTokenId();
         }
     }
 
     /**
-     * Returns the total amount of tokens minted in the contract.
+     * @dev Returns the total amount of tokens minted in the contract.
      */
     function _totalMinted() internal view returns (uint256) {
         // Counter underflow is impossible as _currentIndex does not decrement,
-        // and it is initialized to _startTokenId()
+        // and it is initialized to `_startTokenId()`
         unchecked {
             return ERC721AStorage.layout()._currentIndex - _startTokenId();
         }
     }
 
     /**
+     * @dev Returns the total number of tokens burned.
+     */
+    function _totalBurned() internal view returns (uint256) {
+        return ERC721AStorage.layout()._burnCounter;
+    }
+
+    /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        // The interface IDs are constants representing the first 4 bytes of the XOR of 
+        // The interface IDs are constants representing the first 4 bytes of the XOR of
         // all function selectors in the interface. See: https://eips.ethereum.org/EIPS/eip-165
         // e.g. `bytes4(i.functionA.selector ^ i.functionB.selector ^ ...)`
         return
@@ -90,28 +133,28 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      */
     function balanceOf(address owner) public view override returns (uint256) {
         if (owner == address(0)) revert BalanceQueryForZeroAddress();
-        return uint256(ERC721AStorage.layout()._addressData[owner].balance);
+        return ERC721AStorage.layout()._packedAddressData[owner] & BITMASK_ADDRESS_DATA_ENTRY;
     }
 
     /**
      * Returns the number of tokens minted by `owner`.
      */
     function _numberMinted(address owner) internal view returns (uint256) {
-        return uint256(ERC721AStorage.layout()._addressData[owner].numberMinted);
+        return (ERC721AStorage.layout()._packedAddressData[owner] >> BITPOS_NUMBER_MINTED) & BITMASK_ADDRESS_DATA_ENTRY;
     }
 
     /**
      * Returns the number of tokens burned by or on behalf of `owner`.
      */
     function _numberBurned(address owner) internal view returns (uint256) {
-        return uint256(ERC721AStorage.layout()._addressData[owner].numberBurned);
+        return (ERC721AStorage.layout()._packedAddressData[owner] >> BITPOS_NUMBER_BURNED) & BITMASK_ADDRESS_DATA_ENTRY;
     }
 
     /**
      * Returns the auxillary data for `owner`. (e.g. number of whitelist mint slots used).
      */
     function _getAux(address owner) internal view returns (uint64) {
-        return ERC721AStorage.layout()._addressData[owner].aux;
+        return uint64(ERC721AStorage.layout()._packedAddressData[owner] >> BITPOS_AUX);
     }
 
     /**
@@ -119,7 +162,67 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * If there are multiple variables, please pack them into a uint64.
      */
     function _setAux(address owner, uint64 aux) internal {
-        ERC721AStorage.layout()._addressData[owner].aux = aux;
+        uint256 packed = ERC721AStorage.layout()._packedAddressData[owner];
+        uint256 auxCasted;
+        assembly { // Cast aux without masking.
+            auxCasted := aux
+        }
+        packed = (packed & BITMASK_AUX_COMPLEMENT) | (auxCasted << BITPOS_AUX);
+        ERC721AStorage.layout()._packedAddressData[owner] = packed;
+    }
+
+    /**
+     * Returns the packed ownership data of `tokenId`.
+     */
+    function _packedOwnershipOf(uint256 tokenId) private view returns (uint256) {
+        uint256 curr = tokenId;
+
+        unchecked {
+            if (_startTokenId() <= curr)
+                if (curr < ERC721AStorage.layout()._currentIndex) {
+                    uint256 packed = ERC721AStorage.layout()._packedOwnerships[curr];
+                    // If not burned.
+                    if (packed & BITMASK_BURNED == 0) {
+                        // Invariant:
+                        // There will always be an ownership that has an address and is not burned
+                        // before an ownership that does not have an address and is not burned.
+                        // Hence, curr will not underflow.
+                        //
+                        // We can directly compare the packed value.
+                        // If the address is zero, packed is zero.
+                        while (packed == 0) {
+                            packed = ERC721AStorage.layout()._packedOwnerships[--curr];
+                        }
+                        return packed;
+                    }
+                }
+        }
+        revert OwnerQueryForNonexistentToken();
+    }
+
+    /**
+     * Returns the unpacked `TokenOwnership` struct from `packed`.
+     */
+    function _unpackedOwnership(uint256 packed) private pure returns (TokenOwnership memory ownership) {
+        ownership.addr = address(uint160(packed));
+        ownership.startTimestamp = uint64(packed >> BITPOS_START_TIMESTAMP);
+        ownership.burned = packed & BITMASK_BURNED != 0;
+    }
+
+    /**
+     * Returns the unpacked `TokenOwnership` struct at `index`.
+     */
+    function _ownershipAt(uint256 index) internal view returns (TokenOwnership memory) {
+        return _unpackedOwnership(ERC721AStorage.layout()._packedOwnerships[index]);
+    }
+
+    /**
+     * @dev Initializes the ownership slot minted at `index` for efficiency purposes.
+     */
+    function _initializeOwnershipAt(uint256 index) internal {
+        if (ERC721AStorage.layout()._packedOwnerships[index] == 0) {
+            ERC721AStorage.layout()._packedOwnerships[index] = _packedOwnershipOf(index);
+        }
     }
 
     /**
@@ -127,37 +230,14 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * It gradually moves to O(1) as tokens get transferred around in the collection over time.
      */
     function _ownershipOf(uint256 tokenId) internal view returns (TokenOwnership memory) {
-        uint256 curr = tokenId;
-
-        unchecked {
-            if (_startTokenId() <= curr) if (curr < ERC721AStorage.layout()._currentIndex) {
-                TokenOwnership memory ownership = ERC721AStorage.layout()._ownerships[curr];
-                if (!ownership.burned) {
-                    if (ownership.addr != address(0)) {
-                        return ownership;
-                    }
-                    // Invariant:
-                    // There will always be an ownership that has an address and is not burned
-                    // before an ownership that does not have an address and is not burned.
-                    // Hence, curr will not underflow.
-                    while (true) {
-                        curr--;
-                        ownership = ERC721AStorage.layout()._ownerships[curr];
-                        if (ownership.addr != address(0)) {
-                            return ownership;
-                        }
-                    }
-                }
-            }
-        }
-        revert OwnerQueryForNonexistentToken();
+        return _unpackedOwnership(_packedOwnershipOf(tokenId));
     }
 
     /**
      * @dev See {IERC721-ownerOf}.
      */
     function ownerOf(uint256 tokenId) public view override returns (address) {
-        return _ownershipOf(tokenId).addr;
+        return address(uint160(_packedOwnershipOf(tokenId)));
     }
 
     /**
@@ -194,15 +274,34 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     }
 
     /**
+     * @dev Casts the address to uint256 without masking.
+     */
+    function _addressToUint256(address value) private pure returns (uint256 result) {
+        assembly {
+            result := value
+        }
+    }
+
+    /**
+     * @dev Casts the boolean to uint256 without branching.
+     */
+    function _boolToUint256(bool value) private pure returns (uint256 result) {
+        assembly {
+            result := value
+        }
+    }
+
+    /**
      * @dev See {IERC721-approve}.
      */
     function approve(address to, uint256 tokenId) public override {
-        address owner = ERC721AUpgradeable.ownerOf(tokenId);
+        address owner = address(uint160(_packedOwnershipOf(tokenId)));
         if (to == owner) revert ApprovalToCurrentOwner();
 
-        if (_msgSenderERC721A() != owner) if(!isApprovedForAll(owner, _msgSenderERC721A())) {
-            revert ApprovalCallerNotOwnerNorApproved();
-        }
+        if (_msgSenderERC721A() != owner)
+            if (!isApprovedForAll(owner, _msgSenderERC721A())) {
+                revert ApprovalCallerNotOwnerNorApproved();
+            }
 
         ERC721AStorage.layout()._tokenApprovals[tokenId] = to;
         emit Approval(owner, to, tokenId);
@@ -266,9 +365,10 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         bytes memory _data
     ) public virtual override {
         _transfer(from, to, tokenId);
-        if (to.code.length != 0) if(!_checkContractOnERC721Received(from, to, tokenId, _data)) {
-            revert TransferToNonERC721ReceiverImplementer();
-        }
+        if (to.code.length != 0)
+            if (!_checkContractOnERC721Received(from, to, tokenId, _data)) {
+                revert TransferToNonERC721ReceiverImplementer();
+            }
     }
 
     /**
@@ -279,7 +379,10 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * Tokens start existing when they are minted (`_mint`),
      */
     function _exists(uint256 tokenId) internal view returns (bool) {
-        return _startTokenId() <= tokenId && tokenId < ERC721AStorage.layout()._currentIndex && !ERC721AStorage.layout()._ownerships[tokenId].burned;
+        return
+            _startTokenId() <= tokenId &&
+            tokenId < ERC721AStorage.layout()._currentIndex && // If within bounds,
+            ERC721AStorage.layout()._packedOwnerships[tokenId] & BITMASK_BURNED == 0; // and not burned.
     }
 
     /**
@@ -315,11 +418,22 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         // balance or numberMinted overflow if current value of either + quantity > 1.8e19 (2**64) - 1
         // updatedIndex overflows if _currentIndex + quantity > 1.2e77 (2**256) - 1
         unchecked {
-            ERC721AStorage.layout()._addressData[to].balance += uint64(quantity);
-            ERC721AStorage.layout()._addressData[to].numberMinted += uint64(quantity);
+            // Updates:
+            // - `balance += quantity`.
+            // - `numberMinted += quantity`.
+            //
+            // We can directly add to the balance and number minted.
+            ERC721AStorage.layout()._packedAddressData[to] += quantity * ((1 << BITPOS_NUMBER_MINTED) | 1);
 
-            ERC721AStorage.layout()._ownerships[startTokenId].addr = to;
-            ERC721AStorage.layout()._ownerships[startTokenId].startTimestamp = uint64(block.timestamp);
+            // Updates:
+            // - `address` to the owner.
+            // - `startTimestamp` to the timestamp of minting.
+            // - `burned` to `false`.
+            // - `nextInitialized` to `quantity == 1`.
+            ERC721AStorage.layout()._packedOwnerships[startTokenId] =
+                _addressToUint256(to) |
+                (block.timestamp << BITPOS_START_TIMESTAMP) |
+                (_boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED);
 
             uint256 updatedIndex = startTokenId;
             uint256 end = updatedIndex + quantity;
@@ -364,11 +478,22 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         // balance or numberMinted overflow if current value of either + quantity > 1.8e19 (2**64) - 1
         // updatedIndex overflows if _currentIndex + quantity > 1.2e77 (2**256) - 1
         unchecked {
-            ERC721AStorage.layout()._addressData[to].balance += uint64(quantity);
-            ERC721AStorage.layout()._addressData[to].numberMinted += uint64(quantity);
+            // Updates:
+            // - `balance += quantity`.
+            // - `numberMinted += quantity`.
+            //
+            // We can directly add to the balance and number minted.
+            ERC721AStorage.layout()._packedAddressData[to] += quantity * ((1 << BITPOS_NUMBER_MINTED) | 1);
 
-            ERC721AStorage.layout()._ownerships[startTokenId].addr = to;
-            ERC721AStorage.layout()._ownerships[startTokenId].startTimestamp = uint64(block.timestamp);
+            // Updates:
+            // - `address` to the owner.
+            // - `startTimestamp` to the timestamp of minting.
+            // - `burned` to `false`.
+            // - `nextInitialized` to `quantity == 1`.
+            ERC721AStorage.layout()._packedOwnerships[startTokenId] =
+                _addressToUint256(to) |
+                (block.timestamp << BITPOS_START_TIMESTAMP) |
+                (_boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED);
 
             uint256 updatedIndex = startTokenId;
             uint256 end = updatedIndex + quantity;
@@ -397,9 +522,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         address to,
         uint256 tokenId
     ) private {
-        TokenOwnership memory prevOwnership = _ownershipOf(tokenId);
+        uint256 prevOwnershipPacked = _packedOwnershipOf(tokenId);
 
-        if (prevOwnership.addr != from) revert TransferFromIncorrectOwner();
+        if (address(uint160(prevOwnershipPacked)) != from) revert TransferFromIncorrectOwner();
 
         bool isApprovedOrOwner = (_msgSenderERC721A() == from ||
             isApprovedForAll(from, _msgSenderERC721A()) ||
@@ -417,23 +542,30 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         // ownership above and the recipient's balance can't realistically overflow.
         // Counter overflow is incredibly unrealistic as tokenId would have to be 2**256.
         unchecked {
-            ERC721AStorage.layout()._addressData[from].balance -= 1;
-            ERC721AStorage.layout()._addressData[to].balance += 1;
+            // We can directly increment and decrement the balances.
+            --ERC721AStorage.layout()._packedAddressData[from]; // Updates: `balance -= 1`.
+            ++ERC721AStorage.layout()._packedAddressData[to]; // Updates: `balance += 1`.
 
-            TokenOwnership storage currSlot = ERC721AStorage.layout()._ownerships[tokenId];
-            currSlot.addr = to;
-            currSlot.startTimestamp = uint64(block.timestamp);
+            // Updates:
+            // - `address` to the next owner.
+            // - `startTimestamp` to the timestamp of transfering.
+            // - `burned` to `false`.
+            // - `nextInitialized` to `true`.
+            ERC721AStorage.layout()._packedOwnerships[tokenId] =
+                _addressToUint256(to) |
+                (block.timestamp << BITPOS_START_TIMESTAMP) |
+                BITMASK_NEXT_INITIALIZED;
 
-            // If the ownership slot of tokenId+1 is not explicitly set, that means the transfer initiator owns it.
-            // Set the slot of tokenId+1 explicitly in storage to maintain correctness for ownerOf(tokenId+1) calls.
-            uint256 nextTokenId = tokenId + 1;
-            TokenOwnership storage nextSlot = ERC721AStorage.layout()._ownerships[nextTokenId];
-            if (nextSlot.addr == address(0)) {
-                // This will suffice for checking _exists(nextTokenId),
-                // as a burned slot cannot contain the zero address.
-                if (nextTokenId != ERC721AStorage.layout()._currentIndex) {
-                    nextSlot.addr = from;
-                    nextSlot.startTimestamp = prevOwnership.startTimestamp;
+            // If the next slot may not have been initialized (i.e. `nextInitialized == false`) .
+            if (prevOwnershipPacked & BITMASK_NEXT_INITIALIZED == 0) {
+                uint256 nextTokenId = tokenId + 1;
+                // If the next slot's address is zero and not burned (i.e. packed value is zero).
+                if (ERC721AStorage.layout()._packedOwnerships[nextTokenId] == 0) {
+                    // If the next slot is within bounds.
+                    if (nextTokenId != ERC721AStorage.layout()._currentIndex) {
+                        // Initialize the next slot to maintain correctness for `ownerOf(tokenId + 1)`.
+                        ERC721AStorage.layout()._packedOwnerships[nextTokenId] = prevOwnershipPacked;
+                    }
                 }
             }
         }
@@ -460,9 +592,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * Emits a {Transfer} event.
      */
     function _burn(uint256 tokenId, bool approvalCheck) internal virtual {
-        TokenOwnership memory prevOwnership = _ownershipOf(tokenId);
+        uint256 prevOwnershipPacked = _packedOwnershipOf(tokenId);
 
-        address from = prevOwnership.addr;
+        address from = address(uint160(prevOwnershipPacked));
 
         if (approvalCheck) {
             bool isApprovedOrOwner = (_msgSenderERC721A() == from ||
@@ -481,26 +613,35 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         // ownership above and the recipient's balance can't realistically overflow.
         // Counter overflow is incredibly unrealistic as tokenId would have to be 2**256.
         unchecked {
-            AddressData storage addressData = ERC721AStorage.layout()._addressData[from];
-            addressData.balance -= 1;
-            addressData.numberBurned += 1;
+            // Updates:
+            // - `balance -= 1`.
+            // - `numberBurned += 1`.
+            //
+            // We can directly decrement the balance, and increment the number burned.
+            // This is equivalent to `packed -= 1; packed += 1 << BITPOS_NUMBER_BURNED;`.
+            ERC721AStorage.layout()._packedAddressData[from] += (1 << BITPOS_NUMBER_BURNED) - 1;
 
-            // Keep track of who burned the token, and the timestamp of burning.
-            TokenOwnership storage currSlot = ERC721AStorage.layout()._ownerships[tokenId];
-            currSlot.addr = from;
-            currSlot.startTimestamp = uint64(block.timestamp);
-            currSlot.burned = true;
+            // Updates:
+            // - `address` to the last owner.
+            // - `startTimestamp` to the timestamp of burning.
+            // - `burned` to `true`.
+            // - `nextInitialized` to `true`.
+            ERC721AStorage.layout()._packedOwnerships[tokenId] =
+                _addressToUint256(from) |
+                (block.timestamp << BITPOS_START_TIMESTAMP) |
+                BITMASK_BURNED | 
+                BITMASK_NEXT_INITIALIZED;
 
-            // If the ownership slot of tokenId+1 is not explicitly set, that means the burn initiator owns it.
-            // Set the slot of tokenId+1 explicitly in storage to maintain correctness for ownerOf(tokenId+1) calls.
-            uint256 nextTokenId = tokenId + 1;
-            TokenOwnership storage nextSlot = ERC721AStorage.layout()._ownerships[nextTokenId];
-            if (nextSlot.addr == address(0)) {
-                // This will suffice for checking _exists(nextTokenId),
-                // as a burned slot cannot contain the zero address.
-                if (nextTokenId != ERC721AStorage.layout()._currentIndex) {
-                    nextSlot.addr = from;
-                    nextSlot.startTimestamp = prevOwnership.startTimestamp;
+            // If the next slot may not have been initialized (i.e. `nextInitialized == false`) .
+            if (prevOwnershipPacked & BITMASK_NEXT_INITIALIZED == 0) {
+                uint256 nextTokenId = tokenId + 1;
+                // If the next slot's address is zero and not burned (i.e. packed value is zero).
+                if (ERC721AStorage.layout()._packedOwnerships[nextTokenId] == 0) {
+                    // If the next slot is within bounds.
+                    if (nextTokenId != ERC721AStorage.layout()._currentIndex) {
+                        // Initialize the next slot to maintain correctness for `ownerOf(tokenId + 1)`.
+                        ERC721AStorage.layout()._packedOwnerships[nextTokenId] = prevOwnershipPacked;
+                    }
                 }
             }
         }
@@ -529,8 +670,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         uint256 tokenId,
         bytes memory _data
     ) private returns (bool) {
-        try ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received(_msgSenderERC721A(), from, tokenId, _data) 
-        returns (bytes4 retval) {
+        try ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received(_msgSenderERC721A(), from, tokenId, _data) returns (
+            bytes4 retval
+        ) {
             return retval == ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received.selector;
         } catch (bytes memory reason) {
             if (reason.length == 0) {
@@ -590,7 +732,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
     /**
      * @dev Returns the message sender (defaults to `msg.sender`).
-     * 
+     *
      * If you are writing GSN compatible contracts, you need to override this function.
      */
     function _msgSenderERC721A() internal view virtual returns (address) {
@@ -605,7 +747,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
         unchecked {
             if (value == 0) {
-                return "0";
+                return '0';
             }
             uint256 temp = value;
             uint256 digits;
@@ -619,7 +761,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
                 buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
                 value /= 10;
             }
-            return string(buffer);    
+            return string(buffer);
         }
     }
 }

@@ -62,4 +62,8 @@ contract ERC721AMockUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
     function toString(uint256 x) public pure returns (string memory) {
         return _toString(x);
     }
+
+    function getOwnershipAt(uint256 index) public view returns (TokenOwnership memory) {
+        return _ownershipAt(index);
+    }
 }

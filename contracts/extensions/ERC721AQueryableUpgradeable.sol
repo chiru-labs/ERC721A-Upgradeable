@@ -6,7 +6,6 @@ pragma solidity ^0.8.4;
 
 import "./IERC721AQueryableUpgradeable.sol";
 import "../ERC721AUpgradeable.sol";
-import { ERC721AStorage } from "../ERC721AStorage.sol";
 import "../ERC721A__Initializable.sol";
 
 /**
@@ -14,7 +13,6 @@ import "../ERC721A__Initializable.sol";
  * @dev ERC721A subclass with convenience query functions.
  */
 abstract contract ERC721AQueryableUpgradeable is ERC721A__Initializable, ERC721AUpgradeable, IERC721AQueryableUpgradeable {
-    using ERC721AStorage for ERC721AStorage.Layout;
     function __ERC721AQueryable_init() internal onlyInitializingERC721A {
         __ERC721AQueryable_init_unchained();
     }
@@ -41,10 +39,10 @@ abstract contract ERC721AQueryableUpgradeable is ERC721A__Initializable, ERC721A
      */
     function explicitOwnershipOf(uint256 tokenId) public view override returns (TokenOwnership memory) {
         TokenOwnership memory ownership;
-        if (tokenId < _startTokenId() || tokenId >= ERC721AStorage.layout()._currentIndex) {
+        if (tokenId < _startTokenId() || tokenId >= _nextTokenId()) {
             return ownership;
         }
-        ownership = ERC721AStorage.layout()._ownerships[tokenId];
+        ownership = _ownershipAt(tokenId);
         if (ownership.burned) {
             return ownership;
         }
@@ -86,12 +84,12 @@ abstract contract ERC721AQueryableUpgradeable is ERC721A__Initializable, ERC721A
         unchecked {
             if (start >= stop) revert InvalidQueryRange();
             uint256 tokenIdsIdx;
-            uint256 stopLimit = ERC721AStorage.layout()._currentIndex;
+            uint256 stopLimit = _nextTokenId();
             // Set `start = max(start, _startTokenId())`.
             if (start < _startTokenId()) {
                 start = _startTokenId();
             }
-            // Set `stop = min(stop, _currentIndex)`.
+            // Set `stop = min(stop, stopLimit)`.
             if (stop > stopLimit) {
                 stop = stopLimit;
             }
@@ -120,7 +118,7 @@ abstract contract ERC721AQueryableUpgradeable is ERC721A__Initializable, ERC721A
                 currOwnershipAddr = ownership.addr;
             }
             for (uint256 i = start; i != stop && tokenIdsIdx != tokenIdsMaxLength; ++i) {
-                ownership = ERC721AStorage.layout()._ownerships[i];
+                ownership = _ownershipAt(i);
                 if (ownership.burned) {
                     continue;
                 }
@@ -157,7 +155,7 @@ abstract contract ERC721AQueryableUpgradeable is ERC721A__Initializable, ERC721A
             uint256[] memory tokenIds = new uint256[](tokenIdsLength);
             TokenOwnership memory ownership;
             for (uint256 i = _startTokenId(); tokenIdsIdx != tokenIdsLength; ++i) {
-                ownership = ERC721AStorage.layout()._ownerships[i];
+                ownership = _ownershipAt(i);
                 if (ownership.burned) {
                     continue;
                 }

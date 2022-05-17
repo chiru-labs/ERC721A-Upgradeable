@@ -4,7 +4,7 @@ const { BigNumber } = require('ethers');
 const { constants } = require('@openzeppelin/test-helpers');
 const { ZERO_ADDRESS } = constants;
 
-const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false }) =>
+const createTestSuite = ({ contract, constructorArgs, initializeOwnersExplicit = false }) =>
   function () {
     let offseted;
 
@@ -123,10 +123,10 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
             expect(await this.erc721aQueryable.balanceOf(minter.address)).to.equal(minter.expected.balance);
           }
 
-          if (setOwnersExplicit) {
+          if (initializeOwnersExplicit) {
             // sanity check
             expect((await this.erc721aQueryable.getOwnershipAt(offseted(4)[0]))[0]).to.equal(ZERO_ADDRESS);
-            await this.erc721aQueryable.setOwnersExplicit(10);
+            await this.erc721aQueryable.initializeOwnersExplicit(10);
             // again, sanity check
             expect((await this.erc721aQueryable.getOwnershipAt(offseted(4)[0]))[0]).to.equal(this.addr3.address);
           }
@@ -252,8 +252,8 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
             const tokenIds = [].concat(this.owner.expected.tokens, this.addr3.expected.tokens);
             const explicitOwnerships = await this.erc721aQueryable.explicitOwnershipsOf(tokenIds);
             for (let i = 0; i < tokenIds.length; ++i) {
-              const tokenId = await this.erc721aQueryable.ownerOf(tokenIds[i]);
-              expectExplicitOwnershipExists(explicitOwnerships[i], tokenId);
+              const owner = await this.erc721aQueryable.ownerOf(tokenIds[i]);
+              expectExplicitOwnershipExists(explicitOwnerships[i], owner);
             }
           });
 
@@ -263,8 +263,8 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
             const explicitOwnerships = await this.erc721aQueryable.explicitOwnershipsOf(tokenIds);
             expectExplicitOwnershipBurned(explicitOwnerships[0], this.owner.address);
             for (let i = 1; i < tokenIds.length; ++i) {
-              const tokenId = await this.erc721aQueryable.ownerOf(tokenIds[i]);
-              expectExplicitOwnershipExists(explicitOwnerships[i], tokenId);
+              const owner = await this.erc721aQueryable.ownerOf(tokenIds[i]);
+              expectExplicitOwnershipExists(explicitOwnerships[i], owner);
             }
           });
 
@@ -274,8 +274,8 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
             const explicitOwnerships = await this.erc721aQueryable.explicitOwnershipsOf(tokenIds);
             expectExplicitOwnershipExists(explicitOwnerships[0], this.addr4.address);
             for (let i = 1; i < tokenIds.length; ++i) {
-              const tokenId = await this.erc721aQueryable.ownerOf(tokenIds[i]);
-              expectExplicitOwnershipExists(explicitOwnerships[i], tokenId);
+              const owner = await this.erc721aQueryable.ownerOf(tokenIds[i]);
+              expectExplicitOwnershipExists(explicitOwnerships[i], owner);
             }
           });
 
@@ -284,8 +284,8 @@ const createTestSuite = ({ contract, constructorArgs, setOwnersExplicit = false 
             const explicitOwnerships = await this.erc721aQueryable.explicitOwnershipsOf(tokenIds);
             expectExplicitOwnershipNotExists(explicitOwnerships[0]);
             for (let i = 1; i < tokenIds.length; ++i) {
-              const tokenId = await this.erc721aQueryable.ownerOf(tokenIds[i]);
-              expectExplicitOwnershipExists(explicitOwnerships[i], tokenId);
+              const owner = await this.erc721aQueryable.ownerOf(tokenIds[i]);
+              expectExplicitOwnershipExists(explicitOwnerships[i], owner);
             }
           });
         });
@@ -311,6 +311,6 @@ describe(
   createTestSuite({
     contract: 'ERC721AQueryableOwnersExplicitMock',
     constructorArgs: ['Azuki', 'AZUKI'],
-    setOwnersExplicit: true,
+    initializeOwnersExplicit: true,
   })
 );

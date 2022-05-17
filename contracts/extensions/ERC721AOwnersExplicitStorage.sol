@@ -4,14 +4,13 @@ pragma solidity ^0.8.0;
 
 
 import { ERC721AOwnersExplicitUpgradeable } from "./ERC721AOwnersExplicitUpgradeable.sol";
-import { ERC721AUpgradeable } from "../ERC721AUpgradeable.sol";
-import { IERC721AUpgradeable } from "../IERC721AUpgradeable.sol";
 
 library ERC721AOwnersExplicitStorage {
 
   struct Layout {
 
-    uint256 nextOwnerToExplicitlySet;
+    // The next token ID to explicity initialize ownership data.
+    uint256 _currentIndexOwnersExplicit;
   
   }
   

@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 
 
 import { ERC721AUpgradeable } from "./ERC721AUpgradeable.sol";
-import { IERC721AUpgradeable } from "./IERC721AUpgradeable.sol";
 
 library ERC721AStorage {
 
   struct Layout {
+
     // The tokenId of the next token to be minted.
     uint256 _currentIndex;
 
@@ -22,13 +22,26 @@ library ERC721AStorage {
     string _symbol;
 
     // Mapping from token ID to ownership details
-    // An empty struct value does not necessarily mean the token is unowned. See _ownershipOf implementation for details.
-    mapping(uint256 => IERC721AUpgradeable.TokenOwnership) _ownerships;
+    // An empty struct value does not necessarily mean the token is unowned.
+    // See `_packedOwnershipOf` implementation for details.
+    //
+    // Bits Layout:
+    // - [0..159]   `addr`
+    // - [160..223] `startTimestamp`
+    // - [224]      `burned`
+    // - [225]      `nextInitialized`
+    mapping(uint256 => uint256) _packedOwnerships;
 
-    // Mapping owner address to address data
-    mapping(address => IERC721AUpgradeable.AddressData) _addressData;
+    // Mapping owner address to address data.
+    //
+    // Bits Layout:
+    // - [0..63]    `balance`
+    // - [64..127]  `numberMinted`
+    // - [128..191] `numberBurned`
+    // - [192..255] `aux`
+    mapping(address => uint256) _packedAddressData;
 
-    // Mapping from token ID to approved address
+    // Mapping from token ID to approved address.
     mapping(uint256 => address) _tokenApprovals;
 
     // Mapping from owner to operator approvals
