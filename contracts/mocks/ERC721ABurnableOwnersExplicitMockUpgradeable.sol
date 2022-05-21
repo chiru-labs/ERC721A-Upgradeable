@@ -15,10 +15,6 @@ contract ERC721ABurnableOwnersExplicitMockUpgradeable is Initializable, ERC721AU
 
     function __ERC721ABurnableOwnersExplicitMock_init_unchained(string memory, string memory) internal onlyInitializing {}
 
-    function exists(uint256 tokenId) public view returns (bool) {
-        return _exists(tokenId);
-    }
-
     function safeMint(address to, uint256 quantity) public {
         _safeMint(to, quantity);
     }

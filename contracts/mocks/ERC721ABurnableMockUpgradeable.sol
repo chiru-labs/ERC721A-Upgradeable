@@ -30,6 +30,10 @@ contract ERC721ABurnableMockUpgradeable is Initializable, ERC721AUpgradeable, ER
         return _totalMinted();
     }
 
+    function totalBurned() public view returns (uint256) {
+        return _totalBurned();
+    }
+
     function numberBurned(address owner) public view returns (uint256) {
         return _numberBurned(owner);
     }

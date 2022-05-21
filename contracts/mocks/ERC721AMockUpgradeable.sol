@@ -22,6 +22,14 @@ contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
         return _totalMinted();
     }
 
+    function totalBurned() public view returns (uint256) {
+        return _totalBurned();
+    }
+
+    function nextTokenId() public view returns (uint256) {
+        return _nextTokenId();
+    }
+
     function getAux(address owner) public view returns (uint64) {
         return _getAux(owner);
     }
@@ -54,6 +62,10 @@ contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
         _mint(to, quantity);
     }
 
+    function burn(uint256 tokenId) public {
+        _burn(tokenId);
+    }
+
     function burn(uint256 tokenId, bool approvalCheck) public {
         _burn(tokenId, approvalCheck);
     }
@@ -64,6 +76,10 @@ contract ERC721AMockUpgradeable is Initializable, ERC721AUpgradeable {
 
     function getOwnershipAt(uint256 index) public view returns (TokenOwnership memory) {
         return _ownershipAt(index);
+    }
+
+    function getOwnershipOf(uint index) public view returns (TokenOwnership memory) {
+        return _ownershipOf(index);
     }
 
     /**

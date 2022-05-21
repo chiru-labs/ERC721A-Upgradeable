@@ -11,8 +11,8 @@ contract ERC721AUpgradeableWithInit is ERC721AUpgradeable {
 import "./ERC721ReceiverMockUpgradeable.sol";
 
 contract ERC721ReceiverMockUpgradeableWithInit is ERC721ReceiverMockUpgradeable {
-    constructor(bytes4 retval) payable initializer {
-        __ERC721ReceiverMock_init(retval);
+    constructor(bytes4 retval, address erc721aMock) payable initializer {
+        __ERC721ReceiverMock_init(retval, erc721aMock);
     }
 }
 import "./ERC721AMockUpgradeable.sol";
