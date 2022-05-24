@@ -19,7 +19,6 @@ cd ..;
 # Replace the contracts and test folder with the latest copy.
 rm -r ./contracts;
 rm -r ./test;
-rm -r @openzeppelin;
 rsync -av --progress ERC721A/ ./ \
 	--exclude README.md \
 	--exclude projects.md \
@@ -38,10 +37,11 @@ npx hardhat compile;
 
 # Transpile.
 echo "Transpiling";
-npx @openzeppelin/upgrade-safe-transpiler -D;
+# -D: delete original and excluded files
+# -E: extract storage for Diamond Pattern
+npx @gnus.ai/upgrade-safe-transpiler-diamond -D -E;
 node scripts/replace-imports.js;
-rm -r contracts/Initializable.sol;
-rm -r @openzeppelin;
+(npm run lint:sol) || true;
 
 # Commit and push
 echo "Committing latest code";

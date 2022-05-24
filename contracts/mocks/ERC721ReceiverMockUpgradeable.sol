@@ -4,14 +4,16 @@
 
 pragma solidity ^0.8.4;
 
-import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import '../ERC721AUpgradeable.sol';
+import {ERC721ReceiverMockStorage} from './ERC721ReceiverMockStorage.sol';
+import '../ERC721A__Initializable.sol';
 
 interface IERC721AMockUpgradeable {
     function safeMint(address to, uint256 quantity) external;
 }
 
-contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721ReceiverUpgradeable {
+contract ERC721ReceiverMockUpgradeable is ERC721A__Initializable, ERC721A__IERC721ReceiverUpgradeable {
+    using ERC721ReceiverMockStorage for ERC721ReceiverMockStorage.Layout;
     enum Error {
         None,
         RevertWithMessage,
@@ -19,18 +21,15 @@ contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721Receive
         Panic
     }
 
-    bytes4 private _retval;
-    address private _erc721aMock;
-
     event Received(address operator, address from, uint256 tokenId, bytes data, uint256 gas);
 
-    function __ERC721ReceiverMock_init(bytes4 retval, address erc721aMock) internal onlyInitializing {
+    function __ERC721ReceiverMock_init(bytes4 retval, address erc721aMock) internal onlyInitializingERC721A {
         __ERC721ReceiverMock_init_unchained(retval, erc721aMock);
     }
 
-    function __ERC721ReceiverMock_init_unchained(bytes4 retval, address erc721aMock) internal onlyInitializing {
-        _retval = retval;
-        _erc721aMock = erc721aMock;
+    function __ERC721ReceiverMock_init_unchained(bytes4 retval, address erc721aMock) internal onlyInitializingERC721A {
+        ERC721ReceiverMockStorage.layout()._retval = retval;
+        ERC721ReceiverMockStorage.layout()._erc721aMock = erc721aMock;
     }
 
     function onERC721Received(
@@ -51,17 +50,10 @@ contract ERC721ReceiverMockUpgradeable is Initializable, ERC721A__IERC721Receive
 
         // for testing the reentrancy protection
         if (bytes1(data) == 0x03) {
-            IERC721AMockUpgradeable(_erc721aMock).safeMint(address(this), 1);
+            IERC721AMockUpgradeable(ERC721ReceiverMockStorage.layout()._erc721aMock).safeMint(address(this), 1);
         }
 
         emit Received(operator, from, tokenId, data, 20000);
-        return _retval;
+        return ERC721ReceiverMockStorage.layout()._retval;
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
 }

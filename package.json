@@ -16,15 +16,12 @@
     "lint:js": "eslint --ignore-path .gitignore . --fix",
     "lint:sol": "prettier --write \"contracts/**/*.sol\""
   },
-  "dependencies": {
-    "@openzeppelin/contracts-upgradeable": "^4.4.2"
-  },
   "devDependencies": {
     "@openzeppelin/contracts": "^4.4.2",
     "@nomiclabs/hardhat-ethers": "^2.0.4",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "@openzeppelin/upgrade-safe-transpiler": "latest",
+    "@gnus.ai/upgrade-safe-transpiler-diamond": "latest",
     "chai": "^4.3.4",
     "eslint": "^8.7.0",
     "eslint-plugin-mocha": "^10.0.3",

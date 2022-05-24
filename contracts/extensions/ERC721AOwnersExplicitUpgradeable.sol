@@ -4,15 +4,19 @@
 
 pragma solidity ^0.8.4;
 
-import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import '../ERC721AUpgradeable.sol';
+import {ERC721AOwnersExplicitStorage} from './ERC721AOwnersExplicitStorage.sol';
+import '../ERC721A__Initializable.sol';
 
-abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgradeable {
-    function __ERC721AOwnersExplicit_init() internal onlyInitializing {
+abstract contract ERC721AOwnersExplicitUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
+    using ERC721AOwnersExplicitStorage for ERC721AOwnersExplicitStorage.Layout;
+
+    function __ERC721AOwnersExplicit_init() internal onlyInitializingERC721A {
+        __ERC721AOwnersExplicit_init_unchained();
     }
 
-    function __ERC721AOwnersExplicit_init_unchained() internal onlyInitializing {
-    }
+    function __ERC721AOwnersExplicit_init_unchained() internal onlyInitializingERC721A {}
+
     /**
      * No more ownership slots to explicity initialize.
      */
@@ -28,14 +32,11 @@ abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgr
      */
     error NoTokensMintedYet();
 
-    // The next token ID to explicity initialize ownership data.
-    uint256 private _currentIndexOwnersExplicit;
-
     /**
      * @dev Returns the next token ID to be explicity initialized.
      */
     function _nextTokenIdOwnersExplicit() internal view returns (uint256) {
-        uint256 tokenId = _currentIndexOwnersExplicit;
+        uint256 tokenId = ERC721AOwnersExplicitStorage.layout()._currentIndexOwnersExplicit;
         if (tokenId == 0) {
             tokenId = _startTokenId();
         }
@@ -66,14 +67,7 @@ abstract contract ERC721AOwnersExplicitUpgradeable is Initializable, ERC721AUpgr
                 _initializeOwnershipAt(i);
             }
 
-            _currentIndexOwnersExplicit = stop;
+            ERC721AOwnersExplicitStorage.layout()._currentIndexOwnersExplicit = stop;
         }
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
 }

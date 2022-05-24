@@ -4,20 +4,25 @@
 
 pragma solidity ^0.8.4;
 
-import "./IERC721AQueryableUpgradeable.sol";
-import "../ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import './IERC721AQueryableUpgradeable.sol';
+import '../ERC721AUpgradeable.sol';
+import '../ERC721A__Initializable.sol';
 
 /**
  * @title ERC721A Queryable
  * @dev ERC721A subclass with convenience query functions.
  */
-abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeable, IERC721AQueryableUpgradeable {
-    function __ERC721AQueryable_init() internal onlyInitializing {
+abstract contract ERC721AQueryableUpgradeable is
+    ERC721A__Initializable,
+    ERC721AUpgradeable,
+    IERC721AQueryableUpgradeable
+{
+    function __ERC721AQueryable_init() internal onlyInitializingERC721A {
+        __ERC721AQueryable_init_unchained();
     }
 
-    function __ERC721AQueryable_init_unchained() internal onlyInitializing {
-    }
+    function __ERC721AQueryable_init_unchained() internal onlyInitializingERC721A {}
+
     /**
      * @dev Returns the `TokenOwnership` struct at `tokenId` without reverting.
      *
@@ -168,11 +173,4 @@ abstract contract ERC721AQueryableUpgradeable is Initializable, ERC721AUpgradeab
             return tokenIds;
         }
     }
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[50] private __gap;
 }
