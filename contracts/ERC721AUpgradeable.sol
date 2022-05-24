@@ -4,9 +4,9 @@
 
 pragma solidity ^0.8.4;
 
-import "./IERC721AUpgradeable.sol";
-import { ERC721AStorage } from "./ERC721AStorage.sol";
-import "./ERC721A__Initializable.sol";
+import './IERC721AUpgradeable.sol';
+import {ERC721AStorage} from './ERC721AStorage.sol';
+import './ERC721A__Initializable.sol';
 
 /**
  * @dev ERC721 token receiver interface.
@@ -52,7 +52,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
     // The bit mask of the `burned` bit in packed ownership.
     uint256 private constant BITMASK_BURNED = 1 << 224;
-    
+
     // The bit position of the `nextInitialized` bit in packed ownership.
     uint256 private constant BITPOS_NEXT_INITIALIZED = 225;
 
@@ -70,7 +70,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     }
 
     /**
-     * @dev Returns the starting token ID. 
+     * @dev Returns the starting token ID.
      * To change the starting token ID, please override this function.
      */
     function _startTokenId() internal view virtual returns (uint256) {
@@ -86,7 +86,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
     /**
      * @dev Returns the total number of tokens in existence.
-     * Burned tokens will reduce the count. 
+     * Burned tokens will reduce the count.
      * To get the total number of tokens minted, please see `_totalMinted`.
      */
     function totalSupply() public view override returns (uint256) {
@@ -164,7 +164,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     function _setAux(address owner, uint64 aux) internal {
         uint256 packed = ERC721AStorage.layout()._packedAddressData[owner];
         uint256 auxCasted;
-        assembly { // Cast aux without masking.
+        assembly {
+            // Cast aux without masking.
             auxCasted := aux
         }
         packed = (packed & BITMASK_AUX_COMPLEMENT) | (auxCasted << BITPOS_AUX);
@@ -629,7 +630,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             ERC721AStorage.layout()._packedOwnerships[tokenId] =
                 _addressToUint256(from) |
                 (block.timestamp << BITPOS_START_TIMESTAMP) |
-                BITMASK_BURNED | 
+                BITMASK_BURNED |
                 BITMASK_NEXT_INITIALIZED;
 
             // If the next slot may not have been initialized (i.e. `nextInitialized == false`) .
@@ -670,9 +671,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         uint256 tokenId,
         bytes memory _data
     ) private returns (bool) {
-        try ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received(_msgSenderERC721A(), from, tokenId, _data) returns (
-            bytes4 retval
-        ) {
+        try
+            ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received(_msgSenderERC721A(), from, tokenId, _data)
+        returns (bytes4 retval) {
             return retval == ERC721A__IERC721ReceiverUpgradeable(to).onERC721Received.selector;
         } catch (bytes memory reason) {
             if (reason.length == 0) {
@@ -742,26 +743,45 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
      */
-    function _toString(uint256 value) internal pure returns (string memory) {
-        // Inspired by OraclizeAPI's implementation - MIT licence
-        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
-        unchecked {
-            if (value == 0) {
-                return '0';
+    function _toString(uint256 value) internal pure returns (string memory ptr) {
+        assembly {
+            // The maximum value of a uint256 contains 78 digits (1 byte per digit),
+            // but we allocate 128 bytes to keep the free memory pointer 32-byte word aliged.
+            // We will need 1 32-byte word to store the length,
+            // and 3 32-byte words to store a maximum of 78 digits. Total: 32 + 3 * 32 = 128.
+            ptr := add(mload(0x40), 128)
+            // Update the free memory pointer to allocate.
+            mstore(0x40, ptr)
+
+            // Cache the end of the memory to calculate the length later.
+            let end := ptr
+
+            // We write the string from the rightmost digit to the leftmost digit.
+            // The following is essentially a do-while loop that also handles the zero case.
+            // Costs a bit more than early returning for the zero case,
+            // but cheaper in terms of deployment and overall runtime costs.
+            for {
+                // Initialize and perform the first pass without check.
+                let temp := value
+                // Move the pointer 1 byte leftwards to point to an empty character slot.
+                ptr := sub(ptr, 1)
+                // Write the character to the pointer. 48 is the ASCII index of '0'.
+                mstore8(ptr, add(48, mod(temp, 10)))
+                temp := div(temp, 10)
+            } temp {
+                // Keep dividing `temp` until zero.
+                temp := div(temp, 10)
+            } {
+                // Body of the for loop.
+                ptr := sub(ptr, 1)
+                mstore8(ptr, add(48, mod(temp, 10)))
             }
-            uint256 temp = value;
-            uint256 digits;
-            while (temp != 0) {
-                ++digits;
-                temp /= 10;
-            }
-            bytes memory buffer = new bytes(digits);
-            while (value != 0) {
-                --digits;
-                buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-                value /= 10;
-            }
-            return string(buffer);
+
+            let length := sub(end, ptr)
+            // Move the pointer 32 bytes leftwards to make room for the length.
+            ptr := sub(ptr, 32)
+            // Store the length.
+            mstore(ptr, length)
         }
     }
 }

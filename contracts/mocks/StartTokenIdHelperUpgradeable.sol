@@ -3,8 +3,8 @@
 // Creators: Chiru Labs
 
 pragma solidity ^0.8.4;
-import { StartTokenIdHelperStorage } from "./StartTokenIdHelperStorage.sol";
-import "../ERC721A__Initializable.sol";
+import {StartTokenIdHelperStorage} from './StartTokenIdHelperStorage.sol';
+import '../ERC721A__Initializable.sol';
 
 /**
  * This Helper is used to return a dynmamic value in the overriden _startTokenId() function.
@@ -21,9 +21,9 @@ contract StartTokenIdHelperUpgradeable is ERC721A__Initializable {
     function __StartTokenIdHelper_init_unchained(uint256 startTokenId_) internal onlyInitializingERC721A {
         StartTokenIdHelperStorage.layout().startTokenId = startTokenId_;
     }
+
     // generated getter for ${varDecl.name}
-    function startTokenId() public view returns(uint256) {
+    function startTokenId() public view returns (uint256) {
         return StartTokenIdHelperStorage.layout().startTokenId;
     }
-
 }

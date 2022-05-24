@@ -4,13 +4,18 @@
 
 pragma solidity ^0.8.4;
 
-import "./ERC721AQueryableMockUpgradeable.sol";
-import "./StartTokenIdHelperUpgradeable.sol";
-import { StartTokenIdHelperStorage } from "./StartTokenIdHelperStorage.sol";
-import "../ERC721A__Initializable.sol";
+import './ERC721AQueryableMockUpgradeable.sol';
+import './StartTokenIdHelperUpgradeable.sol';
+import {StartTokenIdHelperStorage} from './StartTokenIdHelperStorage.sol';
+import '../ERC721A__Initializable.sol';
 
-contract ERC721AQueryableStartTokenIdMockUpgradeable is ERC721A__Initializable, StartTokenIdHelperUpgradeable, ERC721AQueryableMockUpgradeable {
+contract ERC721AQueryableStartTokenIdMockUpgradeable is
+    ERC721A__Initializable,
+    StartTokenIdHelperUpgradeable,
+    ERC721AQueryableMockUpgradeable
+{
     using StartTokenIdHelperStorage for StartTokenIdHelperStorage.Layout;
+
     function __ERC721AQueryableStartTokenIdMock_init(
         string memory name_,
         string memory symbol_,

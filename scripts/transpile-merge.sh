@@ -41,6 +41,7 @@ echo "Transpiling";
 # -E: extract storage for Diamond Pattern
 npx @gnus.ai/upgrade-safe-transpiler-diamond -D -E;
 node scripts/replace-imports.js;
+(npm run lint:sol) || true;
 
 # Commit and push
 echo "Committing latest code";

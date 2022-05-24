@@ -14,54 +14,62 @@ pragma solidity ^0.8.0;
  * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.
  */
 
-import { ERC721A__InitializableStorage } from './ERC721A__InitializableStorage.sol';
+import {ERC721A__InitializableStorage} from './ERC721A__InitializableStorage.sol';
 
 abstract contract ERC721A__Initializable {
-  using ERC721A__InitializableStorage for ERC721A__InitializableStorage.Layout;
+    using ERC721A__InitializableStorage for ERC721A__InitializableStorage.Layout;
 
-  /**
-   * @dev Modifier to protect an initializer function from being invoked twice.
-   */
-  modifier initializerERC721A() {
-    // If the contract is initializing we ignore whether _initialized is set in order to support multiple
-    // inheritance patterns, but we only do this in the context of a constructor, because in other contexts the
-    // contract may have been reentered.
-    require(ERC721A__InitializableStorage.layout()._initializing ? _isConstructor() :
-        !ERC721A__InitializableStorage.layout()._initialized, "ERC721A__Initializable: contract is already initialized");
+    /**
+     * @dev Modifier to protect an initializer function from being invoked twice.
+     */
+    modifier initializerERC721A() {
+        // If the contract is initializing we ignore whether _initialized is set in order to support multiple
+        // inheritance patterns, but we only do this in the context of a constructor, because in other contexts the
+        // contract may have been reentered.
+        require(
+            ERC721A__InitializableStorage.layout()._initializing
+                ? _isConstructor()
+                : !ERC721A__InitializableStorage.layout()._initialized,
+            'ERC721A__Initializable: contract is already initialized'
+        );
 
-    bool isTopLevelCall = !ERC721A__InitializableStorage.layout()._initializing;
-    if (isTopLevelCall) {
-      ERC721A__InitializableStorage.layout()._initializing = true;
-      ERC721A__InitializableStorage.layout()._initialized = true;
+        bool isTopLevelCall = !ERC721A__InitializableStorage.layout()._initializing;
+        if (isTopLevelCall) {
+            ERC721A__InitializableStorage.layout()._initializing = true;
+            ERC721A__InitializableStorage.layout()._initialized = true;
+        }
+
+        _;
+
+        if (isTopLevelCall) {
+            ERC721A__InitializableStorage.layout()._initializing = false;
+        }
     }
 
-    _;
-
-    if (isTopLevelCall) {
-      ERC721A__InitializableStorage.layout()._initializing = false;
+    /**
+     * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
+     * {initializer} modifier, directly or indirectly.
+     */
+    modifier onlyInitializingERC721A() {
+        require(
+            ERC721A__InitializableStorage.layout()._initializing,
+            'ERC721A__Initializable: contract is not initializing'
+        );
+        _;
     }
-  }
 
-  /**
-   * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the
-   * {initializer} modifier, directly or indirectly.
-   */
-  modifier onlyInitializingERC721A() {
-    require(ERC721A__InitializableStorage.layout()._initializing, "ERC721A__Initializable: contract is not initializing");
-    _;
-  }
-
-  /// @dev Returns true if and only if the function is running in the constructor
-  function _isConstructor() private view returns (bool) {
-    // extcodesize checks the size of the code stored in an address, and
-    // address returns the current address. Since the code is still not
-    // deployed when running a constructor, any checks on its code size will
-    // yield zero, making it an effective way to detect if a contract is
-    // under construction or not.
-    address self = address(this);
-    uint256 cs;
-    assembly { cs := extcodesize(self) }
-    return cs == 0;
-  }
-
+    /// @dev Returns true if and only if the function is running in the constructor
+    function _isConstructor() private view returns (bool) {
+        // extcodesize checks the size of the code stored in an address, and
+        // address returns the current address. Since the code is still not
+        // deployed when running a constructor, any checks on its code size will
+        // yield zero, making it an effective way to detect if a contract is
+        // under construction or not.
+        address self = address(this);
+        uint256 cs;
+        assembly {
+            cs := extcodesize(self)
+        }
+        return cs == 0;
+    }
 }

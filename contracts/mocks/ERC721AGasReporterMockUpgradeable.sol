@@ -4,11 +4,14 @@
 
 pragma solidity ^0.8.4;
 
-import "../ERC721AUpgradeable.sol";
-import "../ERC721A__Initializable.sol";
+import '../ERC721AUpgradeable.sol';
+import '../ERC721A__Initializable.sol';
 
 contract ERC721AGasReporterMockUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
-    function __ERC721AGasReporterMock_init(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
+    function __ERC721AGasReporterMock_init(string memory name_, string memory symbol_)
+        internal
+        onlyInitializingERC721A
+    {
         __ERC721A_init_unchained(name_, symbol_);
         __ERC721AGasReporterMock_init_unchained(name_, symbol_);
     }
