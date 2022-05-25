@@ -132,7 +132,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view override returns (uint256) {
-        if (owner == address(0)) revert BalanceQueryForZeroAddress();
+        if (_addressToUint256(owner) == 0) revert BalanceQueryForZeroAddress();
         return ERC721AStorage.layout()._packedAddressData[owner] & BITMASK_ADDRESS_DATA_ENTRY;
     }
 
@@ -410,7 +410,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         bytes memory _data
     ) internal {
         uint256 startTokenId = ERC721AStorage.layout()._currentIndex;
-        if (to == address(0)) revert MintToZeroAddress();
+        if (_addressToUint256(to) == 0) revert MintToZeroAddress();
         if (quantity == 0) revert MintZeroQuantity();
 
         _beforeTokenTransfers(address(0), to, startTokenId, quantity);
@@ -470,7 +470,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      */
     function _mint(address to, uint256 quantity) internal {
         uint256 startTokenId = ERC721AStorage.layout()._currentIndex;
-        if (to == address(0)) revert MintToZeroAddress();
+        if (_addressToUint256(to) == 0) revert MintToZeroAddress();
         if (quantity == 0) revert MintZeroQuantity();
 
         _beforeTokenTransfers(address(0), to, startTokenId, quantity);
@@ -527,17 +527,21 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
         if (address(uint160(prevOwnershipPacked)) != from) revert TransferFromIncorrectOwner();
 
+        address approvedAddress = ERC721AStorage.layout()._tokenApprovals[tokenId];
+
         bool isApprovedOrOwner = (_msgSenderERC721A() == from ||
             isApprovedForAll(from, _msgSenderERC721A()) ||
-            getApproved(tokenId) == _msgSenderERC721A());
+            approvedAddress == _msgSenderERC721A());
 
         if (!isApprovedOrOwner) revert TransferCallerNotOwnerNorApproved();
-        if (to == address(0)) revert TransferToZeroAddress();
+        if (_addressToUint256(to) == 0) revert TransferToZeroAddress();
 
         _beforeTokenTransfers(from, to, tokenId, 1);
 
         // Clear approvals from the previous owner.
-        delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+        if (_addressToUint256(approvedAddress) != 0) {
+            delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+        }
 
         // Underflow of the sender's balance is impossible because we check for
         // ownership above and the recipient's balance can't realistically overflow.
@@ -596,11 +600,12 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         uint256 prevOwnershipPacked = _packedOwnershipOf(tokenId);
 
         address from = address(uint160(prevOwnershipPacked));
+        address approvedAddress = ERC721AStorage.layout()._tokenApprovals[tokenId];
 
         if (approvalCheck) {
             bool isApprovedOrOwner = (_msgSenderERC721A() == from ||
                 isApprovedForAll(from, _msgSenderERC721A()) ||
-                getApproved(tokenId) == _msgSenderERC721A());
+                approvedAddress == _msgSenderERC721A());
 
             if (!isApprovedOrOwner) revert TransferCallerNotOwnerNorApproved();
         }
@@ -608,7 +613,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         _beforeTokenTransfers(from, address(0), tokenId, 1);
 
         // Clear approvals from the previous owner.
-        delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+        if (_addressToUint256(approvedAddress) != 0) {
+            delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+        }
 
         // Underflow of the sender's balance is impossible because we check for
         // ownership above and the recipient's balance can't realistically overflow.
