@@ -33,4 +33,49 @@ contract ERC721AGasReporterMockUpgradeable is ERC721A__Initializable, ERC721AUpg
     function mintTen(address to) public {
         _mint(to, 10);
     }
+
+    function transferTenAsc(address to) public {
+        unchecked {
+            transferFrom(msg.sender, to, 0);
+            transferFrom(msg.sender, to, 1);
+            transferFrom(msg.sender, to, 2);
+            transferFrom(msg.sender, to, 3);
+            transferFrom(msg.sender, to, 4);
+            transferFrom(msg.sender, to, 5);
+            transferFrom(msg.sender, to, 6);
+            transferFrom(msg.sender, to, 7);
+            transferFrom(msg.sender, to, 8);
+            transferFrom(msg.sender, to, 9);
+        }
+    }
+
+    function transferTenDesc(address to) public {
+        unchecked {
+            transferFrom(msg.sender, to, 9);
+            transferFrom(msg.sender, to, 8);
+            transferFrom(msg.sender, to, 7);
+            transferFrom(msg.sender, to, 6);
+            transferFrom(msg.sender, to, 5);
+            transferFrom(msg.sender, to, 4);
+            transferFrom(msg.sender, to, 3);
+            transferFrom(msg.sender, to, 2);
+            transferFrom(msg.sender, to, 1);
+            transferFrom(msg.sender, to, 0);
+        }
+    }
+
+    function transferTenAvg(address to) public {
+        unchecked {
+            transferFrom(msg.sender, to, 4);
+            transferFrom(msg.sender, to, 5);
+            transferFrom(msg.sender, to, 3);
+            transferFrom(msg.sender, to, 6);
+            transferFrom(msg.sender, to, 2);
+            transferFrom(msg.sender, to, 7);
+            transferFrom(msg.sender, to, 1);
+            transferFrom(msg.sender, to, 8);
+            transferFrom(msg.sender, to, 0);
+            transferFrom(msg.sender, to, 9);
+        }
+    }
 }
