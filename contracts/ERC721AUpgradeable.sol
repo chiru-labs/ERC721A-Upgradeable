@@ -268,7 +268,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     /**
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overriden in child contracts.
+     * by default, it can be overridden in child contracts.
      */
     function _baseURI() internal view virtual returns (string memory) {
         return '';

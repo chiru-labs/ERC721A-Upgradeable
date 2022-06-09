@@ -7,9 +7,9 @@ import {StartTokenIdHelperStorage} from './StartTokenIdHelperStorage.sol';
 import '../ERC721A__Initializable.sol';
 
 /**
- * This Helper is used to return a dynmamic value in the overriden _startTokenId() function.
+ * This Helper is used to return a dynamic value in the overridden _startTokenId() function.
  * Extending this Helper before the ERC721A contract give us access to the herein set `startTokenId`
- * to be returned by the overriden `_startTokenId()` function of ERC721A in the ERC721AStartTokenId mocks.
+ * to be returned by the overridden `_startTokenId()` function of ERC721A in the ERC721AStartTokenId mocks.
  */
 contract StartTokenIdHelperUpgradeable is ERC721A__Initializable {
     using StartTokenIdHelperStorage for StartTokenIdHelperStorage.Layout;
