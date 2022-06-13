@@ -296,7 +296,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * @dev See {IERC721-approve}.
      */
     function approve(address to, uint256 tokenId) public override {
-        address owner = address(uint160(_packedOwnershipOf(tokenId)));
+        address owner = ownerOf(tokenId);
 
         if (_msgSenderERC721A() != owner)
             if (!isApprovedForAll(owner, _msgSenderERC721A())) {
