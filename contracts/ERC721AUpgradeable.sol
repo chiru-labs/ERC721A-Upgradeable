@@ -21,10 +21,11 @@ interface ERC721A__IERC721ReceiverUpgradeable {
 }
 
 /**
- * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
- * the Metadata extension. Built to optimize for lower gas during batch mints.
+ * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard,
+ * including the Metadata extension. Built to optimize for lower gas during batch mints.
  *
- * Assumes serials are sequentially minted starting at _startTokenId() (defaults to 0, e.g. 0, 1, 2, 3..).
+ * Assumes serials are sequentially minted starting at `_startTokenId()`
+ * (defaults to 0, e.g. 0, 1, 2, 3..).
  *
  * Assumes that an owner cannot have more than 2**64 - 1 (max value of uint64) of supply.
  *
@@ -300,11 +301,13 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     }
 
     /**
-     * @dev Casts the boolean to uint256 without branching.
+     * @dev Returns the `nextInitialized` flag set if `quantity` equals 1.
      */
-    function _boolToUint256(bool value) private pure returns (uint256 result) {
+    function _nextInitializedFlag(uint256 quantity) private pure returns (uint256 result) {
+        // For branchless setting of the `nextInitialized` flag.
         assembly {
-            result := value
+            // `(quantity == 1) << BITPOS_NEXT_INITIALIZED`.
+            result := shl(BITPOS_NEXT_INITIALIZED, eq(quantity, 1))
         }
     }
 
@@ -467,16 +470,16 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             // - `nextInitialized` to `quantity == 1`.
             ERC721AStorage.layout()._packedOwnerships[startTokenId] = _packOwnershipData(
                 to,
-                (_boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED) | _nextExtraData(address(0), to, 0)
+                _nextInitializedFlag(quantity) | _nextExtraData(address(0), to, 0)
             );
 
             uint256 tokenId = startTokenId;
-            uint256 end = quantity + startTokenId;
+            uint256 end = startTokenId + quantity;
             do {
                 emit Transfer(address(0), to, tokenId++);
             } while (tokenId < end);
 
-            ERC721AStorage.layout()._currentIndex = startTokenId + quantity;
+            ERC721AStorage.layout()._currentIndex = end;
         }
         _afterTokenTransfers(address(0), to, startTokenId, quantity);
     }
@@ -526,7 +529,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             // - `nextInitialized` to `quantity == 1`.
             ERC721AStorage.layout()._packedOwnerships[startTokenId] = _packOwnershipData(
                 to,
-                (_boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED) | _nextExtraData(address(0), to, 0)
+                _nextInitializedFlag(quantity) | _nextExtraData(address(0), to, 0)
             );
 
             emit ConsecutiveTransfer(startTokenId, startTokenId + quantity - 1, address(0), to);
@@ -671,10 +674,11 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
         (uint256 approvedAddressSlot, address approvedAddress) = _getApprovedAddress(tokenId);
 
-        if (approvalCheck)
+        if (approvalCheck) {
+            // The nested ifs save around 20+ gas over a compound boolean condition.
             if (!_isOwnerOrApproved(approvedAddress, from, _msgSenderERC721A()))
-                // The nested ifs save around 20+ gas over a compound boolean condition.
                 if (!isApprovedForAll(from, _msgSenderERC721A())) revert TransferCallerNotOwnerNorApproved();
+        }
 
         _beforeTokenTransfers(from, address(0), tokenId, 1);
 
@@ -798,7 +802,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     ) internal view virtual returns (uint24) {}
 
     /**
-     * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred. This includes minting.
+     * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred.
+     * This includes minting.
      * And also called before burning one token.
      *
      * startTokenId - the first token id to be transferred
@@ -820,8 +825,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     ) internal virtual {}
 
     /**
-     * @dev Hook that is called after a set of serially-ordered token ids have been transferred. This includes
-     * minting.
+     * @dev Hook that is called after a set of serially-ordered token ids have been transferred.
+     * This includes minting.
      * And also called after one token has been burned.
      *
      * startTokenId - the first token id to be transferred
