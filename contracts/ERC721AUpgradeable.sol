@@ -548,6 +548,19 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     }
 
     /**
+     * @dev Zeroes out _tokenApprovals[tokenId]
+     */
+    function _removeTokenApproval(uint256 tokenId) private {
+        mapping(uint256 => address) storage tokenApprovalPtr = ERC721AStorage.layout()._tokenApprovals;
+        assembly {
+            mstore(0x00, tokenId)
+            mstore(0x20, tokenApprovalPtr.slot)
+            let hash := keccak256(0, 0x40)
+            sstore(hash, 0)
+        }
+    }
+
+    /**
      * @dev Transfers `tokenId` from `from` to `to`.
      *
      * Requirements:
@@ -579,7 +592,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
         // Clear approvals from the previous owner.
         if (approvedAddress != address(0)) {
-            delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+            _removeTokenApproval(tokenId);
         }
 
         // Underflow of the sender's balance is impossible because we check for
@@ -653,7 +666,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
 
         // Clear approvals from the previous owner.
         if (approvedAddress != address(0)) {
-            delete ERC721AStorage.layout()._tokenApprovals[tokenId];
+            _removeTokenApproval(tokenId);
         }
 
         // Underflow of the sender's balance is impossible because we check for
