@@ -23,6 +23,7 @@ library ERC721AStorage {
         // - [160..223] `startTimestamp`
         // - [224]      `burned`
         // - [225]      `nextInitialized`
+        // - [232..255] `extraData`
         mapping(uint256 => uint256) _packedOwnerships;
         // Mapping owner address to address data.
         //

@@ -59,6 +59,12 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     // The bit mask of the `nextInitialized` bit in packed ownership.
     uint256 private constant BITMASK_NEXT_INITIALIZED = 1 << 225;
 
+    // The bit position of `extraData` in packed ownership.
+    uint256 private constant BITPOS_EXTRA_DATA = 232;
+
+    // The mask of the lower 160 bits for addresses.
+    uint256 private constant BITMASK_ADDRESS = (1 << 160) - 1;
+
     function __ERC721A_init(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
         __ERC721A_init_unchained(name_, symbol_);
     }
@@ -132,7 +138,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * @dev See {IERC721-balanceOf}.
      */
     function balanceOf(address owner) public view override returns (uint256) {
-        if (_addressToUint256(owner) == 0) revert BalanceQueryForZeroAddress();
+        if (owner == address(0)) revert BalanceQueryForZeroAddress();
         return ERC721AStorage.layout()._packedAddressData[owner] & BITMASK_ADDRESS_DATA_ENTRY;
     }
 
@@ -208,6 +214,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         ownership.addr = address(uint160(packed));
         ownership.startTimestamp = uint64(packed >> BITPOS_START_TIMESTAMP);
         ownership.burned = packed & BITMASK_BURNED != 0;
+        ownership.extraData = uint24(packed >> BITPOS_EXTRA_DATA);
     }
 
     /**
@@ -239,6 +246,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      */
     function _packOwnershipData(address owner, uint256 flags) private view returns (uint256 value) {
         assembly {
+            // Mask `owner` to the lower 160 bits, in case the upper bits somehow aren't clean.
+            owner := and(owner, BITMASK_ADDRESS)
             // `owner | (block.timestamp << BITPOS_START_TIMESTAMP) | flags`.
             value := or(owner, or(shl(BITPOS_START_TIMESTAMP, timestamp()), flags))
         }
@@ -282,15 +291,6 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      */
     function _baseURI() internal view virtual returns (string memory) {
         return '';
-    }
-
-    /**
-     * @dev Casts the address to uint256 without masking.
-     */
-    function _addressToUint256(address value) private pure returns (uint256 result) {
-        assembly {
-            result := value
-        }
     }
 
     /**
@@ -447,7 +447,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      */
     function _mint(address to, uint256 quantity) internal {
         uint256 startTokenId = ERC721AStorage.layout()._currentIndex;
-        if (_addressToUint256(to) == 0) revert MintToZeroAddress();
+        if (to == address(0)) revert MintToZeroAddress();
         if (quantity == 0) revert MintZeroQuantity();
 
         _beforeTokenTransfers(address(0), to, startTokenId, quantity);
@@ -470,7 +470,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             // - `nextInitialized` to `quantity == 1`.
             ERC721AStorage.layout()._packedOwnerships[startTokenId] = _packOwnershipData(
                 to,
-                _boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED
+                (_boolToUint256(quantity == 1) << BITPOS_NEXT_INITIALIZED) | _nextExtraData(address(0), to, 0)
             );
 
             uint256 offset = startTokenId;
@@ -510,12 +510,12 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             approvedAddress == _msgSenderERC721A());
 
         if (!isApprovedOrOwner) revert TransferCallerNotOwnerNorApproved();
-        if (_addressToUint256(to) == 0) revert TransferToZeroAddress();
+        if (to == address(0)) revert TransferToZeroAddress();
 
         _beforeTokenTransfers(from, to, tokenId, 1);
 
         // Clear approvals from the previous owner.
-        if (_addressToUint256(approvedAddress) != 0) {
+        if (approvedAddress != address(0)) {
             delete ERC721AStorage.layout()._tokenApprovals[tokenId];
         }
 
@@ -532,7 +532,10 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             // - `startTimestamp` to the timestamp of transfering.
             // - `burned` to `false`.
             // - `nextInitialized` to `true`.
-            ERC721AStorage.layout()._packedOwnerships[tokenId] = _packOwnershipData(to, BITMASK_NEXT_INITIALIZED);
+            ERC721AStorage.layout()._packedOwnerships[tokenId] = _packOwnershipData(
+                to,
+                BITMASK_NEXT_INITIALIZED | _nextExtraData(from, to, prevOwnershipPacked)
+            );
 
             // If the next slot may not have been initialized (i.e. `nextInitialized == false`) .
             if (prevOwnershipPacked & BITMASK_NEXT_INITIALIZED == 0) {
@@ -586,7 +589,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         _beforeTokenTransfers(from, address(0), tokenId, 1);
 
         // Clear approvals from the previous owner.
-        if (_addressToUint256(approvedAddress) != 0) {
+        if (approvedAddress != address(0)) {
             delete ERC721AStorage.layout()._tokenApprovals[tokenId];
         }
 
@@ -609,7 +612,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             // - `nextInitialized` to `true`.
             ERC721AStorage.layout()._packedOwnerships[tokenId] = _packOwnershipData(
                 from,
-                BITMASK_BURNED | BITMASK_NEXT_INITIALIZED
+                (BITMASK_BURNED | BITMASK_NEXT_INITIALIZED) | _nextExtraData(from, address(0), prevOwnershipPacked)
             );
 
             // If the next slot may not have been initialized (i.e. `nextInitialized == false`) .
@@ -664,6 +667,42 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
             }
         }
     }
+
+    /**
+     * @dev Returns the next extra data for the packed ownership data.
+     * The returned result is shifted into position.
+     */
+    function _nextExtraData(
+        address from,
+        address to,
+        uint256 prevOwnershipPacked
+    ) internal view virtual returns (uint256) {
+        uint24 previousExtraData;
+        assembly {
+            previousExtraData := shr(BITPOS_EXTRA_DATA, prevOwnershipPacked)
+        }
+        return uint256(_extraData(from, to, previousExtraData)) << BITPOS_EXTRA_DATA;
+    }
+
+    /**
+     * @dev Called during each token transfer to set the 24bit `extraData` field.
+     * Intended to be overridden by the cosumer contract.
+     *
+     * `previousExtraData` - the value of `extraData` before transfer.
+     *
+     * Calling conditions:
+     *
+     * - When `from` and `to` are both non-zero, `from`'s `tokenId` will be
+     * transferred to `to`.
+     * - When `from` is zero, `tokenId` will be minted for `to`.
+     * - When `to` is zero, `tokenId` will be burned by `from`.
+     * - `from` and `to` are never both zero.
+     */
+    function _extraData(
+        address from,
+        address to,
+        uint24 previousExtraData
+    ) internal view virtual returns (uint24) {}
 
     /**
      * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred. This includes minting.

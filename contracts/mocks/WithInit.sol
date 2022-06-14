@@ -23,6 +23,13 @@ contract ERC721AMockUpgradeableWithInit is ERC721AMockUpgradeable {
         __ERC721AMock_init(name_, symbol_);
     }
 }
+import './ERC721ATransferCounterMockUpgradeable.sol';
+
+contract ERC721ATransferCounterMockUpgradeableWithInit is ERC721ATransferCounterMockUpgradeable {
+    constructor(string memory name_, string memory symbol_) payable initializerERC721A {
+        __ERC721ATransferCounterMock_init(name_, symbol_);
+    }
+}
 import './ERC721AStartTokenIdMockUpgradeable.sol';
 
 contract ERC721AStartTokenIdMockUpgradeableWithInit is ERC721AStartTokenIdMockUpgradeable {
