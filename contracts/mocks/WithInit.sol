@@ -16,6 +16,19 @@ contract ERC721ReceiverMockUpgradeableWithInit is ERC721ReceiverMockUpgradeable 
         __ERC721ReceiverMock_init(retval, erc721aMock);
     }
 }
+import './ERC721AWithERC2309MockUpgradeable.sol';
+
+contract ERC721AWithERC2309MockUpgradeableWithInit is ERC721AWithERC2309MockUpgradeable {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        address to,
+        uint256 quantity,
+        bool mintInConstructor
+    ) payable initializerERC721A {
+        __ERC721AWithERC2309Mock_init(name_, symbol_, to, quantity, mintInConstructor);
+    }
+}
 import './ERC721AMockUpgradeable.sol';
 
 contract ERC721AMockUpgradeableWithInit is ERC721AMockUpgradeable {
