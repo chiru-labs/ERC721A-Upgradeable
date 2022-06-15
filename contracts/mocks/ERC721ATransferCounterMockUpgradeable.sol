@@ -35,4 +35,8 @@ contract ERC721ATransferCounterMockUpgradeable is ERC721A__Initializable, ERC721
         }
         return previousExtraData + 1;
     }
+
+    function setExtraDataAt(uint256 index, uint24 extraData) public {
+        _setExtraDataAt(index, extraData);
+    }
 }
