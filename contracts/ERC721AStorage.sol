@@ -34,7 +34,7 @@ library ERC721AStorage {
         // - [192..255] `aux`
         mapping(address => uint256) _packedAddressData;
         // Mapping from token ID to approved address.
-        mapping(uint256 => address) _tokenApprovals;
+        mapping(uint256 => ERC721AUpgradeable.TokenApprovalRef) _tokenApprovals;
         // Mapping from owner to operator approvals
         mapping(address => mapping(address => bool)) _operatorApprovals;
     }

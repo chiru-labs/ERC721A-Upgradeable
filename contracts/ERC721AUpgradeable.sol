@@ -33,6 +33,11 @@ interface ERC721A__IERC721ReceiverUpgradeable {
  */
 contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
+    // Reference type for token approval.
+    struct TokenApprovalRef {
+        address value;
+    }
+
     // Mask of an entry in packed address data.
     uint256 private constant BITMASK_ADDRESS_DATA_ENTRY = (1 << 64) - 1;
 
@@ -325,7 +330,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
                 revert ApprovalCallerNotOwnerNorApproved();
             }
 
-        ERC721AStorage.layout()._tokenApprovals[tokenId] = to;
+        ERC721AStorage.layout()._tokenApprovals[tokenId].value = to;
         emit Approval(owner, to, tokenId);
     }
 
@@ -335,7 +340,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     function getApproved(uint256 tokenId) public view virtual override returns (address) {
         if (!_exists(tokenId)) revert ApprovalQueryForNonexistentToken();
 
-        return ERC721AStorage.layout()._tokenApprovals[tokenId];
+        return ERC721AStorage.layout()._tokenApprovals[tokenId].value;
     }
 
     /**
@@ -550,14 +555,10 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         view
         returns (uint256 approvedAddressSlot, address approvedAddress)
     {
-        mapping(uint256 => address) storage tokenApprovalsPtr = ERC721AStorage.layout()._tokenApprovals;
+        TokenApprovalRef storage tokenApproval = ERC721AStorage.layout()._tokenApprovals[tokenId];
         // The following is equivalent to `approvedAddress = _tokenApprovals[tokenId]`.
         assembly {
-            // Compute the slot.
-            mstore(0x00, tokenId)
-            mstore(0x20, tokenApprovalsPtr.slot)
-            approvedAddressSlot := keccak256(0x00, 0x40)
-            // Load the slot's value from storage.
+            approvedAddressSlot := tokenApproval.slot
             approvedAddress := sload(approvedAddressSlot)
         }
     }
