@@ -9,8 +9,9 @@ import '../ERC721AUpgradeable.sol';
 import '../ERC721A__Initializable.sol';
 
 /**
- * @title ERC721A Burnable Token
- * @dev ERC721A Token that can be irreversibly burned (destroyed).
+ * @title ERC721ABurnable.
+ *
+ * @dev ERC721A token that can be irreversibly burned (destroyed).
  */
 abstract contract ERC721ABurnableUpgradeable is
     ERC721A__Initializable,

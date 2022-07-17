@@ -7,7 +7,7 @@ pragma solidity ^0.8.4;
 import '../IERC721AUpgradeable.sol';
 
 /**
- * @dev Interface of an ERC721ABurnable compliant contract.
+ * @dev Interface of ERC721ABurnable.
  */
 interface IERC721ABurnableUpgradeable is IERC721AUpgradeable {
     /**

@@ -6,7 +6,11 @@ import {ERC721AUpgradeable} from './ERC721AUpgradeable.sol';
 
 library ERC721AStorage {
     struct Layout {
-        // The tokenId of the next token to be minted.
+        // =============================================================
+        //                            STORAGE
+        // =============================================================
+
+        // The next token ID to be minted.
         uint256 _currentIndex;
         // The number of tokens burned.
         uint256 _burnCounter;
@@ -16,7 +20,7 @@ library ERC721AStorage {
         string _symbol;
         // Mapping from token ID to ownership details
         // An empty struct value does not necessarily mean the token is unowned.
-        // See `_packedOwnershipOf` implementation for details.
+        // See {_packedOwnershipOf} implementation for details.
         //
         // Bits Layout:
         // - [0..159]   `addr`

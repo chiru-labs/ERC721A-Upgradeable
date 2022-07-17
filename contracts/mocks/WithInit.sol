@@ -97,6 +97,13 @@ contract ERC721ABurnableStartTokenIdMockUpgradeableWithInit is ERC721ABurnableSt
         __ERC721ABurnableStartTokenIdMock_init(name_, symbol_, startTokenId_);
     }
 }
+import './ERC4907AMockUpgradeable.sol';
+
+contract ERC4907AMockUpgradeableWithInit is ERC4907AMockUpgradeable {
+    constructor(string memory name_, string memory symbol_) payable initializerERC721A {
+        __ERC4907AMock_init(name_, symbol_);
+    }
+}
 import './ERC721AGasReporterMockUpgradeable.sol';
 
 contract ERC721AGasReporterMockUpgradeableWithInit is ERC721AGasReporterMockUpgradeable {

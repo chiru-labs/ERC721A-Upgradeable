@@ -9,7 +9,8 @@ import '../ERC721AUpgradeable.sol';
 import '../ERC721A__Initializable.sol';
 
 /**
- * @title ERC721A Queryable
+ * @title ERC721AQueryable.
+ *
  * @dev ERC721A subclass with convenience query functions.
  */
 abstract contract ERC721AQueryableUpgradeable is
@@ -27,22 +28,25 @@ abstract contract ERC721AQueryableUpgradeable is
      * @dev Returns the `TokenOwnership` struct at `tokenId` without reverting.
      *
      * If the `tokenId` is out of bounds:
-     *   - `addr` = `address(0)`
-     *   - `startTimestamp` = `0`
-     *   - `burned` = `false`
-     *   - `extraData` = `0`
+     *
+     * - `addr = address(0)`
+     * - `startTimestamp = 0`
+     * - `burned = false`
+     * - `extraData = 0`
      *
      * If the `tokenId` is burned:
-     *   - `addr` = `<Address of owner before token was burned>`
-     *   - `startTimestamp` = `<Timestamp when token was burned>`
-     *   - `burned = `true`
-     *   - `extraData` = `<Extra data when token was burned>`
+     *
+     * - `addr = <Address of owner before token was burned>`
+     * - `startTimestamp = <Timestamp when token was burned>`
+     * - `burned = true`
+     * - `extraData = <Extra data when token was burned>`
      *
      * Otherwise:
-     *   - `addr` = `<Address of owner>`
-     *   - `startTimestamp` = `<Timestamp of start of ownership>`
-     *   - `burned = `false`
-     *   - `extraData` = `<Extra data at start of ownership>`
+     *
+     * - `addr = <Address of owner>`
+     * - `startTimestamp = <Timestamp of start of ownership>`
+     * - `burned = false`
+     * - `extraData = <Extra data at start of ownership>`
      */
     function explicitOwnershipOf(uint256 tokenId) public view virtual override returns (TokenOwnership memory) {
         TokenOwnership memory ownership;
@@ -87,7 +91,7 @@ abstract contract ERC721AQueryableUpgradeable is
      *
      * Requirements:
      *
-     * - `start` < `stop`
+     * - `start < stop`
      */
     function tokensOfOwnerIn(
         address owner,
@@ -153,12 +157,12 @@ abstract contract ERC721AQueryableUpgradeable is
     /**
      * @dev Returns an array of token IDs owned by `owner`.
      *
-     * This function scans the ownership mapping and is O(totalSupply) in complexity.
+     * This function scans the ownership mapping and is O(`totalSupply`) in complexity.
      * It is meant to be called off-chain.
      *
      * See {ERC721AQueryable-tokensOfOwnerIn} for splitting the scan into
      * multiple smaller scans if the collection is large enough to cause
-     * an out-of-gas error (10K pfp collections should be fine).
+     * an out-of-gas error (10K collections should be fine).
      */
     function tokensOfOwner(address owner) external view virtual override returns (uint256[] memory) {
         unchecked {
