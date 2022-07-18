@@ -41,8 +41,7 @@ abstract contract ERC4907AUpgradeable is ERC721A__Initializable, ERC721AUpgradea
         address user,
         uint64 expires
     ) public virtual {
-        // Require the message sender to be either
-        // the token owner, an approved operator, or an approved address.
+        // Require the caller to be either the token owner or an approved operator.
         address owner = ownerOf(tokenId);
         if (_msgSenderERC721A() != owner)
             if (!isApprovedForAll(owner, _msgSenderERC721A()))
