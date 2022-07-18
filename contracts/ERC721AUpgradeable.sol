@@ -33,7 +33,7 @@ interface ERC721A__IERC721ReceiverUpgradeable {
  * Assumptions:
  *
  * - An owner cannot have more than 2**64 - 1 (max value of uint64) of supply.
- * - The maximum token id cannot exceed 2**256 - 1 (max value of uint256).
+ * - The maximum token ID cannot exceed 2**256 - 1 (max value of uint256).
  */
 contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
@@ -612,8 +612,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * are about to be transferred. This includes minting.
      * And also called before burning one token.
      *
-     * startTokenId - the first token id to be transferred
-     * quantity - the amount to be transferred
+     * `startTokenId` - the first token ID to be transferred.
+     * `quantity` - the amount to be transferred.
      *
      * Calling conditions:
      *
@@ -635,8 +635,8 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * have been transferred. This includes minting.
      * And also called after one token has been burned.
      *
-     * startTokenId - the first token id to be transferred
-     * quantity - the amount to be transferred
+     * `startTokenId` - the first token ID to be transferred.
+     * `quantity` - the amount to be transferred.
      *
      * Calling conditions:
      *
@@ -656,11 +656,12 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     /**
      * @dev Private function to invoke {IERC721Receiver-onERC721Received} on a target contract.
      *
-     * @param from address representing the previous owner of the given token ID
-     * @param to target address that will receive the tokens
-     * @param tokenId uint256 ID of the token to be transferred
-     * @param _data bytes optional data to send along with the call
-     * @return bool whether the call correctly returned the expected magic value
+     * `from` - Previous owner of the given token ID.
+     * `to` - Target address that will receive the token.
+     * `tokenId` - Token ID to be transferred.
+     * `_data` - Optional data to send along with the call.
+     *
+     * Returns whether the call correctly returned the expected magic value.
      */
     function _checkContractOnERC721Received(
         address from,
