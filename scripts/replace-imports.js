@@ -28,7 +28,7 @@ glob('contracts/**/*.sol', null, function (err, files) {
 // Replace the TokenApprovalRef to break cyclic importing.
 let erc721aFilepath = 'contracts/ERC721AUpgradeable.sol';
 let erc721aContents = fs.readFileSync(erc721aFilepath, 'utf8');
-let tokenApprovalRefRe = /\/\/.*?\n\r?\s*struct TokenApprovalRef\s*\{[^\}]+\}/;
+let tokenApprovalRefRe = /\/\/.*?\n\r?\s*struct TokenApprovalRef\s*\{[^}]+\}/;
 let tokenApprovalRefMatch = erc721aContents.match(tokenApprovalRefRe);
 if (tokenApprovalRefMatch) {
   erc721aContents = erc721aContents
@@ -43,5 +43,5 @@ if (tokenApprovalRefMatch) {
     .replace(/ERC721AUpgradeable.TokenApprovalRef/g, 'ERC721AStorage.TokenApprovalRef')
     .replace(/import.*?\.\/ERC721AUpgradeable.sol[^;]+;/, '');
   
-  fs.writeFileSync(erc721aStorageFilepath, erc721aStorageContents);    
+  fs.writeFileSync(erc721aStorageFilepath, erc721aStorageContents);
 }
