@@ -37,10 +37,6 @@ interface ERC721A__IERC721ReceiverUpgradeable {
  */
 contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     using ERC721AStorage for ERC721AStorage.Layout;
-    // Reference type for token approval.
-    struct TokenApprovalRef {
-        address value;
-    }
 
     // =============================================================
     //                           CONSTANTS
@@ -480,7 +476,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         view
         returns (uint256 approvedAddressSlot, address approvedAddress)
     {
-        TokenApprovalRef storage tokenApproval = ERC721AStorage.layout()._tokenApprovals[tokenId];
+        ERC721AStorage.TokenApprovalRef storage tokenApproval = ERC721AStorage.layout()._tokenApprovals[tokenId];
         // The following is equivalent to `approvedAddress = _tokenApprovals[tokenId]`.
         assembly {
             approvedAddressSlot := tokenApproval.slot
