@@ -40,7 +40,7 @@ abstract contract ERC4907AUpgradeable is ERC721A__Initializable, ERC721AUpgradea
         uint256 tokenId,
         address user,
         uint64 expires
-    ) public virtual {
+    ) public virtual override {
         // Require the caller to be either the token owner or an approved operator.
         address owner = ownerOf(tokenId);
         if (_msgSenderERC721A() != owner)
@@ -58,7 +58,7 @@ abstract contract ERC4907AUpgradeable is ERC721A__Initializable, ERC721AUpgradea
      * @dev Returns the user address for `tokenId`.
      * The zero address indicates that there is no user or if the user is expired.
      */
-    function userOf(uint256 tokenId) public view virtual returns (address) {
+    function userOf(uint256 tokenId) public view virtual override returns (address) {
         uint256 packed = ERC4907AStorage.layout()._packedUserInfo[tokenId];
         assembly {
             // Branchless `packed *= (block.timestamp <= expires ? 1 : 0)`.
@@ -76,7 +76,7 @@ abstract contract ERC4907AUpgradeable is ERC721A__Initializable, ERC721AUpgradea
     /**
      * @dev Returns the user's expires of `tokenId`.
      */
-    function userExpires(uint256 tokenId) public view virtual returns (uint256) {
+    function userExpires(uint256 tokenId) public view virtual override returns (uint256) {
         return ERC4907AStorage.layout()._packedUserInfo[tokenId] >> _BITPOS_EXPIRES;
     }
 
