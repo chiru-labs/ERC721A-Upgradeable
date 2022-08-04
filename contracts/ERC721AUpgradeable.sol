@@ -477,7 +477,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         returns (uint256 approvedAddressSlot, address approvedAddress)
     {
         ERC721AStorage.TokenApprovalRef storage tokenApproval = ERC721AStorage.layout()._tokenApprovals[tokenId];
-        // The following is equivalent to `approvedAddress = _tokenApprovals[tokenId]`.
+        // The following is equivalent to `approvedAddress = _tokenApprovals[tokenId].value`.
         assembly {
             approvedAddressSlot := tokenApproval.slot
             approvedAddress := sload(approvedAddressSlot)
