@@ -421,8 +421,6 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
      * Emits an {ApprovalForAll} event.
      */
     function setApprovalForAll(address operator, bool approved) public virtual override {
-        if (operator == _msgSenderERC721A()) revert ApproveToCaller();
-
         ERC721AStorage.layout()._operatorApprovals[_msgSenderERC721A()][operator] = approved;
         emit ApprovalForAll(_msgSenderERC721A(), operator, approved);
     }
