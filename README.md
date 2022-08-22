@@ -13,6 +13,8 @@
 
 > **📢 Version 4.x introduces several breaking changes. [Please refer to the documentation for more details.](https://chiru-labs.github.io/ERC721A/#/migration)**
 
+_We highly recommend reading the migration guide_, **especially** _the part on [`supportsInterface`](https://chiru-labs.github.io/ERC721A/#/migration?id=supportsinterface) if you are using with OpenZeppelin extensions_ (e.g. ERC2981).
+
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
@@ -25,7 +27,7 @@ It follows all of the rules for [Writing Upgradeable Contracts]: constructors ar
 
 [writing upgradeable contracts]: https://docs.openzeppelin.com/upgrades-plugins/writing-upgradeable
 
-> :warning: **Warning**
+> **Warning**
 >
 > There will be storage incompatibilities across major versions of this package, which makes it unsafe to upgrade a deployed contract from one major version to another, for example from 3.4.0 to 4.0.0.
 >
