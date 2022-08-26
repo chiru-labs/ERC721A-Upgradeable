@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 library ERC721AStorage {
-    // Reference type for token approval.
+    // Bypass for a `--via-ir` bug (https://github.com/chiru-labs/ERC721A/pull/364).
     struct TokenApprovalRef {
         address value;
     }
