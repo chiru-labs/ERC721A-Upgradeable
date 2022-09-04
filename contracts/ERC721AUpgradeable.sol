@@ -739,6 +739,9 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
                     startTokenId // `tokenId`.
                 )
 
+                // The `iszero(eq(,))` check ensures that large values of `quantity`
+                // that overflows uint256 will make the loop run out of gas.
+                // The compiler will optimize the `iszero` away for performance.
                 for {
                     let tokenId := add(startTokenId, 1)
                 } iszero(eq(tokenId, end)) {
