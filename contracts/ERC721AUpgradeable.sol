@@ -309,9 +309,17 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
         uint256 curr = tokenId;
 
         unchecked {
-            if (_startTokenId() <= curr)
+            if (_startTokenId() <= curr) {
+                // load the packed ownership of the current tokenId
+                uint256 packed = ERC721AStorage.layout()._packedOwnerships[curr];
+
+                // If the data exists, and it's not burned, return it and skip tracing
+                // This is possible because we have already achieved the target condition
+                // This saves 2143 gas on transfers of initialized tokens.
+                if (packed != 0 && packed & _BITMASK_BURNED == 0) return packed;
+
+                // If the tokenId is within index-bounds
                 if (curr < ERC721AStorage.layout()._currentIndex) {
-                    uint256 packed = ERC721AStorage.layout()._packedOwnerships[curr];
                     // If not burned.
                     if (packed & _BITMASK_BURNED == 0) {
                         // Invariant:
@@ -329,6 +337,7 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
                         return packed;
                     }
                 }
+            }
         }
         revert OwnerQueryForNonexistentToken();
     }
