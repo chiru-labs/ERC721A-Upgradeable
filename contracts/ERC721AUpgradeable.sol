@@ -877,10 +877,11 @@ contract ERC721AUpgradeable is ERC721A__Initializable, IERC721AUpgradeable {
     ) internal virtual {
         address owner = ownerOf(tokenId);
 
-        if (approvalCheck && _msgSenderERC721A() != owner)
-            if (!isApprovedForAll(owner, _msgSenderERC721A())) {
-                revert ApprovalCallerNotOwnerNorApproved();
-            }
+        if (approvalCheck)
+            if (_msgSenderERC721A() != owner)
+                if (!isApprovedForAll(owner, _msgSenderERC721A())) {
+                    revert ApprovalCallerNotOwnerNorApproved();
+                }
 
         ERC721AStorage.layout()._tokenApprovals[tokenId].value = to;
         emit Approval(owner, to, tokenId);

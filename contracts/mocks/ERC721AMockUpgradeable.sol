@@ -39,6 +39,10 @@ contract ERC721AMockUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
         _setAux(owner, aux);
     }
 
+    function directApprove(address to, uint256 tokenId) public {
+        _approve(to, tokenId);
+    }
+
     function baseURI() public view returns (string memory) {
         return _baseURI();
     }
