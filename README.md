@@ -132,8 +132,8 @@ Project Link: [https://github.com/chiru-labs/ERC721A-Upgradeable](https://github
 [docs-url]: https://chiru-labs.github.io/ERC721A/#/upgradeable
 [npm-shield]: https://img.shields.io/npm/v/erc721a-upgradeable.svg?style=for-the-badge
 [npm-url]: https://www.npmjs.com/package/erc721a-upgradeable
-[ci-shield]: https://img.shields.io/github/workflow/status/chiru-labs/ERC721A-Upgradeable/ERC721A%20Upgradeable%20CI?label=build&style=for-the-badge
-[ci-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/actions/workflows/run_tests.yml
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/chiru-labs/ERC721A-Upgradeable/run-tests.yml?label=build&style=for-the-badge&branch=main
+[ci-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/actions/workflows/run-tests.yml
 [issues-shield]: https://img.shields.io/github/issues/chiru-labs/ERC721A-Upgradeable.svg?style=for-the-badge
 [issues-url]: https://github.com/chiru-labs/ERC721A-Upgradeable/issues
 [license-shield]: https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge
