@@ -99,7 +99,7 @@ abstract contract ERC721AQueryableUpgradeable is
         uint256 stop
     ) external view virtual override returns (uint256[] memory) {
         unchecked {
-            if (start >= stop) revert InvalidQueryRange();
+            if (start >= stop) _revert(InvalidQueryRange.selector);
             uint256 tokenIdsIdx;
             uint256 stopLimit = _nextTokenId();
             // Set `start = max(start, _startTokenId())`.

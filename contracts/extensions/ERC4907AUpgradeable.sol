@@ -45,7 +45,7 @@ abstract contract ERC4907AUpgradeable is ERC721A__Initializable, ERC721AUpgradea
         address owner = ownerOf(tokenId);
         if (_msgSenderERC721A() != owner)
             if (!isApprovedForAll(owner, _msgSenderERC721A()))
-                if (getApproved(tokenId) != _msgSenderERC721A()) revert SetUserCallerNotOwnerNorApproved();
+                if (getApproved(tokenId) != _msgSenderERC721A()) _revert(SetUserCallerNotOwnerNorApproved.selector);
 
         ERC4907AStorage.layout()._packedUserInfo[tokenId] =
             (uint256(expires) << _BITPOS_EXPIRES) |
