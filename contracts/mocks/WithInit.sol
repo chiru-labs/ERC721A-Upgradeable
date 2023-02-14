@@ -36,6 +36,13 @@ contract ERC721AMockUpgradeableWithInit is ERC721AMockUpgradeable {
         __ERC721AMock_init(name_, symbol_);
     }
 }
+import './DirectBurnBitSetterHelperUpgradeable.sol';
+
+contract DirectBurnBitSetterHelperUpgradeableWithInit is DirectBurnBitSetterHelperUpgradeable {
+    constructor() payable initializerERC721A {
+        __DirectBurnBitSetterHelper_init();
+    }
+}
 import './ERC721ATransferCounterMockUpgradeable.sol';
 
 contract ERC721ATransferCounterMockUpgradeableWithInit is ERC721ATransferCounterMockUpgradeable {

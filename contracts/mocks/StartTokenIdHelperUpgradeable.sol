@@ -3,7 +3,6 @@
 // Creators: Chiru Labs
 
 pragma solidity ^0.8.4;
-import {StartTokenIdHelperStorage} from './StartTokenIdHelperStorage.sol';
 import '../ERC721A__Initializable.sol';
 
 /**
@@ -12,18 +11,28 @@ import '../ERC721A__Initializable.sol';
  * to be returned by the overridden `_startTokenId()` function of ERC721A in the ERC721AStartTokenId mocks.
  */
 contract StartTokenIdHelperUpgradeable is ERC721A__Initializable {
-    using StartTokenIdHelperStorage for StartTokenIdHelperStorage.Layout;
+    // `bytes4(keccak256('startTokenId'))`.
+    uint256 private constant _START_TOKEN_ID_STORAGE_SLOT = 0x28f75032;
 
     function __StartTokenIdHelper_init(uint256 startTokenId_) internal onlyInitializingERC721A {
         __StartTokenIdHelper_init_unchained(startTokenId_);
     }
 
     function __StartTokenIdHelper_init_unchained(uint256 startTokenId_) internal onlyInitializingERC721A {
-        StartTokenIdHelperStorage.layout().startTokenId = startTokenId_;
+        _initializeStartTokenId(startTokenId_);
     }
 
-    // generated getter for ${varDecl.name}
-    function startTokenId() public view returns (uint256) {
-        return StartTokenIdHelperStorage.layout().startTokenId;
+    function startTokenId() public view returns (uint256 result) {
+        assembly {
+            result := sload(_START_TOKEN_ID_STORAGE_SLOT)
+        }
+    }
+
+    function _initializeStartTokenId(uint256 value) private {
+        // We use assembly to directly set the `startTokenId` in storage so that
+        // inheriting this class won't affect the layout of other storage slots.
+        assembly {
+            sstore(_START_TOKEN_ID_STORAGE_SLOT, value)
+        }
     }
 }

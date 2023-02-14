@@ -13,6 +13,7 @@ contract ERC721ATransferCounterMockUpgradeable is ERC721A__Initializable, ERC721
         onlyInitializingERC721A
     {
         __ERC721A_init_unchained(name_, symbol_);
+        __DirectBurnBitSetterHelper_init_unchained();
         __ERC721AMock_init_unchained(name_, symbol_);
         __ERC721ATransferCounterMock_init_unchained(name_, symbol_);
     }

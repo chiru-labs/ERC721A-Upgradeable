@@ -5,11 +5,13 @@
 pragma solidity ^0.8.4;
 
 import '../ERC721AUpgradeable.sol';
+import './DirectBurnBitSetterHelperUpgradeable.sol';
 import '../ERC721A__Initializable.sol';
 
-contract ERC721AMockUpgradeable is ERC721A__Initializable, ERC721AUpgradeable {
+contract ERC721AMockUpgradeable is ERC721A__Initializable, ERC721AUpgradeable, DirectBurnBitSetterHelperUpgradeable {
     function __ERC721AMock_init(string memory name_, string memory symbol_) internal onlyInitializingERC721A {
         __ERC721A_init_unchained(name_, symbol_);
+        __DirectBurnBitSetterHelper_init_unchained();
         __ERC721AMock_init_unchained(name_, symbol_);
     }
 
