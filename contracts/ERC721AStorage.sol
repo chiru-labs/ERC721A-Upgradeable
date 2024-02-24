@@ -44,6 +44,9 @@ library ERC721AStorage {
         mapping(uint256 => ERC721AStorage.TokenApprovalRef) _tokenApprovals;
         // Mapping from owner to operator approvals
         mapping(address => mapping(address => bool)) _operatorApprovals;
+        // The amount of tokens minted above `_sequentialUpTo()`.
+        // We call these spot mints (i.e. non-sequential mints).
+        uint256 _spotMinted;
     }
 
     bytes32 internal constant STORAGE_SLOT = keccak256('ERC721A.contracts.storage.ERC721A');

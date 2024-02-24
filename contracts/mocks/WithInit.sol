@@ -68,6 +68,34 @@ contract StartTokenIdHelperUpgradeableWithInit is StartTokenIdHelperUpgradeable 
         __StartTokenIdHelper_init(startTokenId_);
     }
 }
+import './ERC721ASpotMockUpgradeable.sol';
+
+contract ERC721ASpotMockUpgradeableWithInit is ERC721ASpotMockUpgradeable {
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        uint256 startTokenId_,
+        uint256 sequentialUpTo_,
+        uint256 quantity,
+        bool mintInConstructor
+    ) payable initializerERC721A {
+        __ERC721ASpotMock_init(name_, symbol_, startTokenId_, sequentialUpTo_, quantity, mintInConstructor);
+    }
+}
+import './ERC721AQueryableMockUpgradeable.sol';
+
+contract ERC721AQueryableMockUpgradeableWithInit is ERC721AQueryableMockUpgradeable {
+    constructor(string memory name_, string memory symbol_) payable initializerERC721A {
+        __ERC721AQueryableMock_init(name_, symbol_);
+    }
+}
+import './SequentialUpToHelperUpgradeable.sol';
+
+contract SequentialUpToHelperUpgradeableWithInit is SequentialUpToHelperUpgradeable {
+    constructor(uint256 sequentialUpTo_) payable initializerERC721A {
+        __SequentialUpToHelper_init(sequentialUpTo_);
+    }
+}
 import './ERC721AQueryableStartTokenIdMockUpgradeable.sol';
 
 contract ERC721AQueryableStartTokenIdMockUpgradeableWithInit is ERC721AQueryableStartTokenIdMockUpgradeable {
@@ -77,13 +105,6 @@ contract ERC721AQueryableStartTokenIdMockUpgradeableWithInit is ERC721AQueryable
         uint256 startTokenId_
     ) payable initializerERC721A {
         __ERC721AQueryableStartTokenIdMock_init(name_, symbol_, startTokenId_);
-    }
-}
-import './ERC721AQueryableMockUpgradeable.sol';
-
-contract ERC721AQueryableMockUpgradeableWithInit is ERC721AQueryableMockUpgradeable {
-    constructor(string memory name_, string memory symbol_) payable initializerERC721A {
-        __ERC721AQueryableMock_init(name_, symbol_);
     }
 }
 import './ERC721ABurnableMockUpgradeable.sol';
